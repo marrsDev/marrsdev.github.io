@@ -1,5 +1,8 @@
 // public/js/app.js
 
+    // Initialize Heroku Backend URL
+const HEROKU_BACKEND_URL = window.HEROKU_BACKEND_URL || 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
+
 console.log('🔄 app.js loading...');
 console.log('Backend URL:', HEROKU_BACKEND_URL);
 
@@ -12,9 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize variables
     let cost = 0; // ADD THIS LINE - cost variable was missing
-
-    // Initialize Heroku Backend URL
-    const HEROKU_BACKEND_URL = window.HEROKU_BACKEND_URL;
     
     // Add event listener to calculate button
     const calculateButton = document.querySelector('.startButton');
@@ -249,3 +249,4 @@ window.updatePreview = updatePreview;
 window.updateProfileConfig = updateProfileConfig;
 
 console.log('app.js loaded successfully');
+
