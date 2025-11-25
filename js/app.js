@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let cost = 0; // ADD THIS LINE - cost variable was missing
 
     // Initialize Heroku Backend URL
-    const HEROKU_BACKEND_URL = window.HEROKU_BACKEND_URL || 'http://localhost:3000';
+    const HEROKU_BACKEND_URL = window.HEROKU_BACKEND_URL;
     
     // Add event listener to calculate button
     const calculateButton = document.querySelector('.startButton');
@@ -247,4 +247,5 @@ function updateProfileConfig() {
 // Make sure these functions are available globally
 window.updatePreview = updatePreview;
 window.updateProfileConfig = updateProfileConfig;
+
 console.log('app.js loaded successfully');
