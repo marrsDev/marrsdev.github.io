@@ -1,9 +1,43 @@
-// public/js/cartManager.js - COMPLETELY FIXED VERSION
+// public/js/cartManager.js 
+const IS_DEV = window.location.hostname.includes('localhost') || 
+               window.location.hostname.includes('127.0.0.1');
 class CartManager {
   constructor() {
-    this.backendUrl = HEROKU_BACKEND_URL || 'http://localhost:3000';
-    console.log('🛒 CartManager initialized with backend:', this.backendUrl);
+    this.backendUrl = HEROKU_BACKEND_URL;
+
     
+    // Type labels mapping with categories - Defined at class level
+    this.typeLabels = {
+      // Sliding Windows
+      type1: { label: '2 Panel Sliding Window', category: 'sliding' },
+      type2: { label: '2 Panel Sliding Window with Fixed', category: 'sliding' },
+      type3: { label: '2 Panel Sliding Window with Double Fixed', category: 'sliding' },
+      type4: { label: '3 Panel Sliding Window', category: 'sliding' },
+      type5: { label: '3 Panel Sliding Window with Fixed', category: 'sliding' },
+      type6: { label: '3 Panel Sliding Window with Double Fixed', category: 'sliding' },
+      type7: { label: '4 Panel Sliding Window', category: 'sliding' },
+      type8: { label: '4 Panel Sliding Window with Fixed', category: 'sliding' },
+      type9: { label: '4 Panel Sliding Window with Double Fixed', category: 'sliding' },
+      type10: { label: '2 Panel with Openable Top', category: 'sliding-hybrid' },
+      type11: { label: '3 Panel with Openable Top', category: 'sliding-hybrid' },
+      type12: { label: '4 Panel with Openable Top', category: 'sliding-hybrid' },
+      
+      // Top-Hung/Casement Windows
+      type13: { label: 'Single Top-Hung Window', category: 'top-hung' },
+      type14: { label: 'Double Top-Hung Window', category: 'top-hung' },
+      type15: { label: 'Custom Projecting Light Window', category: 'top-hung' },
+      type16: { label: 'Single Centre-Hung Window', category: 'top-hung' },
+      type17: { label: 'Fixed Light Window - Small Vent', category: 'top-hung' },
+      type18: { label: 'Fixed Light Window', category: 'top-hung' },
+      
+      // Sliding with Awning Top
+      type19: { label: 'Sliding with Awning Top', category: 'hybrid' },
+      
+      // Folding Windows
+      type20: { label: '4 Panel Folding Window', category: 'folding' },
+      type21: { label: '3 Panel Folding Window', category: 'folding' }
+    };
+
     // First check if we have a cart in URL
     const urlParams = new URLSearchParams(window.location.search);
     const cartParam = urlParams.get('cart');
@@ -60,7 +94,9 @@ class CartManager {
 
   async loadCart() {
     try {
-      console.log('🛒 Loading cart from:', this.backendUrl + '/api/cart');
+      if (IS_DEV) {
+        console.log('🛒 Loading cart from:', this.backendUrl + '/api/cart');
+      }
       const response = await fetch(this.backendUrl + '/api/cart', {
         headers: {
           'X-Cart-ID': this.cartId
@@ -86,6 +122,8 @@ class CartManager {
 
   async addToCart(itemData) {
     try {
+      console.log('🛒 cartManager.addToCart called with:', itemData);
+      
       const response = await fetch(this.backendUrl + '/api/cart', {
         method: 'POST',
         headers: {
@@ -95,17 +133,28 @@ class CartManager {
         body: JSON.stringify(itemData)
       });
 
+      console.log('📤 Response status:', response.status);
+      
       const data = await response.json();
+
       
       if (data.success) {
+        console.log('✅ Item added to cart successfully');
+        console.log('📊 Response structure:', {
+          hasItems: !!data.items,
+          itemsCount: data.items?.length || 0,
+          hasTotals: !!data.totals
+        });
+        
+        // Force re-render even if items might be empty
         this.renderCart(data);
         return true;
       } else {
-        console.error('Failed to add to cart:', data.error);
+        console.error('❌ Failed to add to cart:', data.error);
         return false;
       }
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      console.error('❌ Error adding to cart:', error);
       return false;
     }
   }
@@ -185,12 +234,26 @@ class CartManager {
   }
 
   renderCart(cartData) {
+    console.log('🎨 renderCart called with data:', cartData);
+    
     const cartPreview = document.getElementById('cart-preview');
-    if (!cartPreview) return;
+    console.log('🔍 cartPreview element:', cartPreview);
+    console.log('📍 Document readyState:', document.readyState);
+    
+    if (!cartPreview) {
+      console.error('❌ #cart-preview element not found!');
+      console.log('🔍 Searching for cart elements:');
+      console.log('- cart-preview:', document.getElementById('cart-preview'));
+      console.log('- .cart-preview:', document.querySelector('.cart-preview'));
+      console.log('- cart-container:', document.querySelector('.cart-container'));
+      return;
+    }
 
     const { items, totals } = cartData;
+    console.log('📦 Cart data:', { items, totals });
     
     if (!items || items.length === 0) {
+      console.log('🛒 Cart is empty, showing empty state');
       cartPreview.innerHTML = `
         <div class="cart-container">
           <div class="empty-cart">
@@ -201,28 +264,22 @@ class CartManager {
       return;
     }
 
-    // Type labels mapping
-    const typeLabels = {
-      type1: '2 Panel Sliding Window',
-      type2: '2 Panel Sliding Window with Fixed',
-      type3: '2 Panel Sliding Window with Double Fixed',
-      type4: '3 Panel Sliding Window',
-      type5: '3 Panel Sliding Window with Fixed',
-      type6: '3 Panel Sliding Window with Double Fixed',
-      type7: '4 Panel Sliding Window',
-      type8: '4 Panel Sliding Window with Fixed',
-      type9: '4 Panel Sliding Window with Double Fixed',
-      type10: '2 Panel with Openable Top',
-      type11: '3 Panel with Openable Top',
-      type12: '4 Panel with Openable Top',
-      type13: 'Single Top-Hung Window',
-      type14: 'Double Top-Hung Window',
-      type15: 'Custom Projecting Light Window',
-      type16: 'Single Centre-Hung Window',
-      type17: 'Sliding with Awning Top',
-      type18: '4 Panel Folding Window',
-      type19: '3 Panel Folding Window'
-    };
+    console.log('🛒 Rendering cart with', items.length, 'items');
+
+    // Group items by category
+    const categorizedItems = {};
+    items.forEach(item => {
+      const typeInfo = this.typeLabels[item.type] || { label: item.type, category: 'other' };
+      const category = typeInfo.category;
+      
+      if (!categorizedItems[category]) {
+        categorizedItems[category] = {
+          label: this.getCategoryLabel(category),
+          items: []
+        };
+      }
+      categorizedItems[category].items.push({ ...item, typeInfo });
+    });
 
     let html = `
       <div class="cart-container">
@@ -235,32 +292,47 @@ class CartManager {
         </div>
     `;
 
-    items.forEach(item => {
-      const itemTotal = Math.round(item.unitPrice * item.quantity);
+    // Render items by category
+    Object.entries(categorizedItems).forEach(([category, categoryData]) => {
+      // Optional: Add category header
       html += `
-        <div class="cart-item" data-id="${item._id}">
-          <div class="preview">
-            <img src="/img/labels/${item.type}.png" alt="${typeLabels[item.type] || item.type}" width="100" height="100">
-          </div>
-          <div class="description">
-            <h4>${item.measurements.width} × ${item.measurements.height} mm</h4>
-            <p>[${item.profileColour}]</p>
-            <p>${item.glassThickness} ${item.glassType} glass</p>
-            <button class="remove-btn" onclick="cartManager.removeItem('${item._id}')">Remove</button>
-          </div>
-          <div class="price">
-            Ksh ${Math.round(item.unitPrice).toLocaleString()}
-          </div>
-          <div class="quantity">
-            <button class="qty-btn plus" onclick="cartManager.updateQuantity('${item._id}', ${item.quantity + 1})">+</button>
-            <span class="qty-value">${item.quantity}</span>
-            <button class="qty-btn minus" onclick="cartManager.updateQuantity('${item._id}', ${item.quantity - 1})">−</button>
-          </div>
-          <div class="total">
-            Ksh ${itemTotal.toLocaleString()}
-          </div>
+        <div class="cart-category-header">
+          <h3>${categoryData.label}</h3>
         </div>
       `;
+      
+      categoryData.items.forEach(item => {
+        const itemTotal = Math.round(item.unitPrice * item.quantity);
+        
+        // Get the correct image path based on category
+        const imagePath = this.getImagePath(item.type, item.typeInfo.category);
+        
+        html += `
+          <div class="cart-item" data-id="${item._id}" data-category="${item.typeInfo.category}">
+            <div class="preview">
+              <img src="${imagePath}" alt="${item.typeInfo.label}" width="100" height="100">
+            </div>
+            <div class="description">
+              <h4>${item.typeInfo.label}</h4>
+              <p>${item.measurements.width} × ${item.measurements.height} mm</p>
+              <p>Color: ${item.profileColour}</p>
+              <p>Glass: ${item.glassThickness} ${item.glassType}</p>
+              <button class="remove-btn" onclick="cartManager.removeItem('${item._id}')">Remove</button>
+            </div>
+            <div class="price">
+              Ksh ${Math.round(item.unitPrice).toLocaleString()}
+            </div>
+            <div class="quantity">
+              <button class="qty-btn plus" onclick="cartManager.updateQuantity('${item._id}', ${item.quantity + 1})">+</button>
+              <span class="qty-value">${item.quantity}</span>
+              <button class="qty-btn minus" onclick="cartManager.updateQuantity('${item._id}', ${item.quantity - 1})">−</button>
+            </div>
+            <div class="total">
+              Ksh ${itemTotal.toLocaleString()}
+            </div>
+          </div>
+        `;
+      });
     });
 
     const roundedGrandTotal = Math.round(totals.grandTotal || 0);
@@ -280,6 +352,39 @@ class CartManager {
     `;
 
     cartPreview.innerHTML = html;
+  }
+
+  // Add these helper methods to CartManager class
+  getCategoryLabel(category) {
+    const categoryLabels = {
+      'sliding': 'Sliding Windows',
+      'top-hung': 'Top-Hung Windows',
+      'hybrid': 'Hybrid Windows',
+      'sliding-hybrid': 'Sliding Windows with Openable Top',
+      'folding': 'Folding Windows',
+      'doors': 'Aluminium Doors',
+      'facades': 'Curtain Walling Facades',
+      'partitions': 'Office Partitions',
+      'other': 'Other Items'
+    };
+    return categoryLabels[category] || category;
+  }
+
+  getImagePath(type, category) {
+    // Define different image directories for different categories
+    const imageDirs = {
+      'sliding': '/img/labels/sliding/',
+      'top-hung': '/img/labels/top-hung/',
+      'hybrid': '/img/labels/hybrid/',
+      'sliding-hybrid': '/img/labels/hybrid/',
+      'folding': '/img/labels/folding/',
+      'doors': '/img/labels/doors/',
+      'facades': '/img/labels/facades/',
+      'partitions': '/img/labels/partitions/'
+    };
+    
+    const dir = imageDirs[category] || '/img/labels/';
+    return `${dir}${type}.png`;
   }
 
   exportQuote() {
