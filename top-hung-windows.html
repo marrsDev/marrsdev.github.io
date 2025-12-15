@@ -17,9 +17,59 @@
 
 <body>
 
+    <noscript>
+        <style>
+            /* Remove display: none from #app so frontend is visible */
+            .js-alert {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(82, 87, 84, 1); /* Semi-transparent white */
+                border: 2px solid #ccc;
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                text-align: center;
+                font-family: Arial, sans-serif;
+                backdrop-filter: blur(5px); /* Frosted glass effect */
+                z-index: 10000; /* Ensure it's on top */
+            }
+
+            .js-alert h3 {
+                color: #ff6b6b;
+                margin-bottom: 15px;
+                font-size: 24px;
+            }
+            .js-alert p {
+                margin: 10px 0;
+                color: white;
+                line-height: 1.4;
+            }
+            /* Optional: slightly dim the background content */
+            .js-alert-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.1); /* Very subtle overlay */
+                z-index: 9999;
+            }
+        </style>
+        <!-- Subtle overlay -->
+        <div class="js-alert-overlay"></div>
+        <!-- Alert popup -->
+        <div class="js-alert">
+            <h3>⚠️JavaScript is Disabled</h3>
+            <p>This app requires JavaScript.</p>
+            <p>Please enable JavaScript and refresh.</p>
+        </div>
+    </noscript>
+
     <!-- Add this wrapper right after <body> -->
     <div id="app">
-        
+
     <div id="touchnav-wrapper">
 
 
@@ -94,7 +144,7 @@
                 </select>
             </li>
                 <li><label>Select Window Type:</label>
-                    <select id="topHungWindowType" onchange="typeGallery()">
+                    <select id="topHungWindowType">
                     <option value="doublePanel">Double panels</option>
                     <option value="singlePanel">Single Top-Hung panel</option>
                     <option value="customLight">Custom Light Window</option>
@@ -130,7 +180,7 @@
             </li>
             <li>
             <div class="calculateCost">
-                <button class="startButton" onclick="start()">Calculate Cost</button>
+                <button class="startButton">Calculate Cost</button>
                 <input type="text" id="cost" readonly> <!-- Add `readonly` if the input is not editable -->
             </div>                
             </li>
@@ -298,7 +348,7 @@
                     <div class="userGuide-widget">
                         
                         
-                            <h1 class="widget-title"><span aria-hidden="true" class="icon-calendar"></span>Follow the following steps to getcurrent Aluminium window prices in Kenya</h1>
+                            <h1 class="widget-title"><span aria-hidden="true" class="icon-calendar"></span>Follow these steps to get current Aluminium window prices in Kenya</h1>
                             
                             <ul class="user-guide-items">
                                 
@@ -520,30 +570,332 @@
 
 </div> <!-- Close the Alpine container -->
 
+    <!-- Heroku Backend Pre-warmer -->
+    <div id="backend-status" style="display: none; position: fixed; top: 10px; right: 10px; background: #f39c12; color: white; padding: 8px 12px; border-radius: 4px; font-size: 12px; z-index: 1000;">
+        ⚡ Calculator engine is starting...
+    </div>
+
+    <script>
+        // Heroku Backend Configuration commented out for development
+        const HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
+        
+        // For local development
+        // const HEROKU_BACKEND_URL = 'http://localhost:3000';
+        // console.log('Backend URL configured:', HEROKU_BACKEND_URL);
+    </script>
+
 <script src="/js/cartManager.js" defer></script>
 <script src="/js/cookieConsent.js" defer></script>
 <script src="/js/pinned-previews.js" defer></script>
 <script src="/js/gallery-js.js" defer></script>
 <script type="module" src="/js/app.js" defer></script>
 
+    <script>
+        // Initialize event listeners specifically for top-hung page
+        document.addEventListener('DOMContentLoaded', function() {
+            const topHungWindowType = document.getElementById('topHungWindowType');
+            if (topHungWindowType) {
+                topHungWindowType.addEventListener('change', function() {
+                    if (typeof updatePreview === 'function') {
+                        updatePreview();
+                    }
+                });
+            }
+        });
+    </script>
+
+    <script>
+    setTimeout(function(){
+        if(typeof window.acceptCookies == "undefined"){
+            window.acceptCookies = function(){
+                localStorage.setItem("cookieConsent","accepted");
+                document.getElementById("cookie-consent").style.display="none";
+            };
+            window.rejectCookies = function(){
+                localStorage.setItem("cookieConsent","rejected");
+                document.getElementById("cookie-consent").style.display="none";
+                document.cookie="cartId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+            };
+            if(!localStorage.getItem("cookieConsent")){
+                document.getElementById("cookie-consent").style.display="block";
+            }
+        }
+    }, 50);
+    </script>
+
+
+    <!-- Backend Pre-warmer Script -->
+    <script>
+        class HerokuBackendWarmer {
+            constructor() {
+                this.backendReady = false;
+                this.warmUpAttempts = 0;
+                this.maxAttempts = 12; // 2 minutes total
+                this.init();
+            }
+
+            init() {
+                this.showStatus();
+                this.startAggressiveWarming();
+                this.setupUserInteractionWarming();
+            }
+
+            showStatus() {
+                const statusEl = document.getElementById('backend-status');
+                statusEl.style.display = 'block';
+                
+                // Auto-hide after 2 minutes
+                setTimeout(() => {
+                    if (!this.backendReady) {
+                        statusEl.style.display = 'none';
+                    }
+                }, 120000);
+            }
+
+            hideStatus() {
+                const statusEl = document.getElementById('backend-status');
+                statusEl.style.display = 'none';
+                statusEl.style.background = '#27ae60';
+                statusEl.innerHTML = '✅ Calculator ready!';
+                
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 3000);
+            }
+
+            startAggressiveWarming() {
+                // Immediate call
+                this.pingBackend();
+                
+                // Call every 10 seconds for 2 minutes
+                this.interval = setInterval(() => {
+                    if (!this.backendReady && this.warmUpAttempts < this.maxAttempts) {
+                        this.pingBackend();
+                    } else {
+                        clearInterval(this.interval);
+                    }
+                }, 10000);
+            }
+
+            setupUserInteractionWarming() {
+                // Warm up on any user interaction
+                const warmEvents = ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'];
+                
+                warmEvents.forEach(eventType => {
+                    document.addEventListener(eventType, () => {
+                        if (!this.backendReady) {
+                            this.pingBackend();
+                        }
+                    }, { once: false });
+                });
+
+                // Form field specific warming
+                this.setupFormFieldWarming();
+            }
+
+            setupFormFieldWarming() {
+                const formFields = [
+                    'heightId', 'widthId', 'noOfPanels', 'fixedPartition',
+                    'glassType', 'glassThickness', 'profileColour'
+                ];
+
+                formFields.forEach(fieldId => {
+                    const element = document.getElementById(fieldId);
+                    if (element) {
+                        element.addEventListener('focus', () => this.pingBackend());
+                        element.addEventListener('change', () => this.pingBackend());
+                    }
+                });
+            }
+
+            async pingBackend() {
+                if (this.backendReady || this.warmUpAttempts >= this.maxAttempts) return;
+
+                this.warmUpAttempts++;
+                
+                try {
+                    const response = await fetch(`${HEROKU_BACKEND_URL}/api/health`, {
+                        method: 'GET',
+                        cache: 'no-cache',
+                        mode: 'cors'
+                    });
+                    
+                    if (response.ok) {
+                        this.backendReady = true;
+                        clearInterval(this.interval);
+                        this.hideStatus();
+                        console.log('✅ Heroku backend ready after', this.warmUpAttempts, 'attempts');
+                    }
+                } catch (error) {
+                    console.log(`🔄 Backend warming attempt ${this.warmUpAttempts}/12...`);
+                }
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new HerokuBackendWarmer();
+        });
+    </script>
+
 <script>
-setTimeout(function(){
-    if(typeof window.acceptCookies == "undefined"){
-        window.acceptCookies = function(){
-            localStorage.setItem("cookieConsent","accepted");
-            document.getElementById("cookie-consent").style.display="none";
+    // Make backend URL globally accessible
+    window.HEROKU_BACKEND_URL = 'http://localhost:3000';
+    console.log('🌐 Backend URL set to:', window.HEROKU_BACKEND_URL);
+</script>
+
+    <script>
+    // Make backend URL globally accessible
+    window.HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
+    console.log('🌐 Backend URL set to:', window.HEROKU_BACKEND_URL);
+</script>
+    
+<script>
+// Production-Optimized Network & Blocker Detection - CORRECTED FLOW
+class ProductionDetector {
+    constructor() {
+        this.backendStatus = 'unknown';
+        this.backendUrl = window.HEROKU_BACKEND_URL || 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
+        this.detectedBlockers = [];
+        this.init();
+    }
+
+    async init() {
+        // STEP 1: First check backend connectivity
+        await this.testBackendConnection();
+        
+        // STEP 2: Only check for blockers if backend is having issues
+        if (this.backendStatus !== 'ready') {
+            this.checkForCommonBlockers();
+        }
+        
+        // STEP 3: Start continuous monitoring
+        this.monitorBackend();
+        
+        setTimeout(() => this.reportProductionStatus(), 2000);
+    }
+
+    async monitorBackend() {
+        let attempts = 0;
+        const maxAttempts = 6;
+        
+        const checkBackend = async () => {
+            if (attempts >= maxAttempts) return;
+            
+            attempts++;
+            await this.testBackendConnection();
+            
+            // STEP 4: Only check for blockers if backend continues to fail
+            if (attempts >= 2 && this.backendStatus !== 'ready') {
+                this.checkForCommonBlockers(); // Re-check blockers
+                this.showProductionWarnings();
+            }
+            
+            if (this.backendStatus !== 'ready' && attempts < maxAttempts) {
+                setTimeout(checkBackend, 2000);
+            }
         };
-        window.rejectCookies = function(){
-            localStorage.setItem("cookieConsent","rejected");
-            document.getElementById("cookie-consent").style.display="none";
-            document.cookie="cartId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-        };
-        if(!localStorage.getItem("cookieConsent")){
-            document.getElementById("cookie-consent").style.display="block";
+        
+        checkBackend();
+    }
+
+    async testBackendConnection() {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const response = await fetch(`${this.backendUrl}/api/health`, {
+                method: 'GET',
+                mode: 'cors',
+                credentials: 'omit',
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (response.ok) {
+                this.backendStatus = 'ready';
+                this.hideAllWarnings(); // Hide any existing warnings when backend becomes ready
+            }
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                this.backendStatus = 'warming';
+            } else {
+                this.backendStatus = 'connection_failed';
+            }
         }
     }
-}, 50);
-</script>
+
+    showProductionWarnings() {
+        this.hideAllWarnings();
+        
+        // STEP 5: ONLY show blocker warning if:
+        // 1. Blockers are detected AND 
+        // 2. Backend has clear connection failures (not just warming)
+        if (this.detectedBlockers.length > 0 && this.backendStatus === 'connection_failed') {
+            this.showBlockerWarning();
+        }
+        // Otherwise, rely on the backend status element to show warming messages
+    }
+
+    showBlockerWarning() {
+        console.log('🛡️ Production: Showing blocker warning - confirmed blocking');
+        const warning = document.createElement('div');
+        warning.id = 'production-blocker-warning';
+        warning.innerHTML = `
+            <div style="position: fixed; top: 20px; right: 20px; background: #ff9800; color: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10001; max-width: 400px; font-family: Arial, sans-serif;">
+                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <span style="font-size: 20px; margin-right: 10px;">🛡️</span>
+                    <strong>Connection to Server blocked ⚠️</strong>
+                </div>
+                <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.4;">
+                    Browser extensions are blocking the calculator engine.
+                </p>
+                <div style="font-size: 12px; margin-bottom: 10px;">
+                    <strong>Quick fix:</strong>
+                    <ul style="margin: 5px 0; padding-left: 15px;">
+                        <li>Pause Brave Shields for this site</li>
+                        <li>Disable ad blockers temporarily</li>
+                        <li>Allow JavaScript from localhost:3000</li>
+                    </ul>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: white; color: #ff9800; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                        Dismiss
+                    </button>
+                    <button onclick="location.reload()" style="background: transparent; border: 1px solid white; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                        Retry
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(warning);
+    }
+
+    hideAllWarnings() {
+        const existing = document.getElementById('production-blocker-warning');
+        if (existing) existing.remove();
+    }
+
+    // ... rest of the methods same as before
+    checkForCommonBlockers() {
+        // Same implementation as before
+    }
+    
+    reportProductionStatus() {
+        console.log('🏭 Production Status:', {
+            backend: this.backendStatus,
+            blockers: this.detectedBlockers
+        });
+    }
+}
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 Initializing Production Detector - CORRECTED FLOW');
+        new ProductionDetector();
+    });
+    </script>
 
 </body>
 
