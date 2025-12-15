@@ -66,7 +66,6 @@
         </div>
     </noscript>
 
-    <!-- Add this wrapper right after <body> -->
     <div id="app">
 
     <div id="touchnav-wrapper">
@@ -604,7 +603,7 @@
 
 </div><!-- end #touchnav-wrapper -->
 
-</div> <!-- Close the Alpine container -->
+</div> <!-- Close the App container -->
 
     <!-- Heroku Backend Pre-warmer -->
     <div id="backend-status" style="display: none; position: fixed; top: 10px; right: 10px; background: #f39c12; color: white; padding: 8px 12px; border-radius: 4px; font-size: 12px; z-index: 1000;">
@@ -759,7 +758,12 @@
             new HerokuBackendWarmer();
         });
     </script>
-
+<script>
+    // Make backend URL globally accessible
+    window.HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
+    console.log('🌐 Backend URL set to:', window.HEROKU_BACKEND_URL);
+</script>
+    
 <script>
 // Production-Optimized Network & Blocker Detection - CORRECTED FLOW
 class ProductionDetector {
@@ -912,6 +916,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 </html>
+
 
 
 
