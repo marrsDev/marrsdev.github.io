@@ -27,6 +27,19 @@ section {
     margin: 0 auto;
 }
 
+a {
+  /* Remove default link color and use the text color inherited from the parent element */
+  color: inherit;
+
+  /* Remove the default underline */
+  text-decoration: none;
+
+  /* Reset hover/visited/active states to also be colorless and without decoration */
+  &:visited, &:active {
+    color: inherit;
+    text-decoration: none;
+  }
+}
 /* Header Styles */
 .main-header {
     background: #1e2933; /* Updated color */
@@ -1514,5 +1527,6 @@ section {
 }
 
     
+
 
 
