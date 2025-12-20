@@ -4,5 +4,3 @@ url: "https://capitalbuilders.co.ke"  # Enforces HTTPS as the canonical protocol
 plugins:
   - jekyll-redirect-from
 
-redirects:
-  "/index.html": "/"  # Redirects the index.html page to the site root
