@@ -1,0 +1,5 @@
+plugins:
+  - jekyll-redirect-from
+
+redirects:
+  "/index.html": "https://capitalbuilders.co.ke/"
