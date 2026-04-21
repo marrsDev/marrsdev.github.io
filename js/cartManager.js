@@ -1,11 +1,11 @@
 // public/js/cartManager.js 
 const IS_DEV = window.location.hostname.includes('localhost') || 
                window.location.hostname.includes('127.0.0.1');
+
 class CartManager {
   constructor() {
     this.backendUrl = HEROKU_BACKEND_URL;
 
-    
     // Type labels mapping with categories - Defined at class level
     this.typeLabels = {
       // Sliding Windows
@@ -35,7 +35,16 @@ class CartManager {
       
       // Folding Windows
       type20: { label: '4 Panel Folding Window', category: 'folding' },
-      type21: { label: '3 Panel Folding Window', category: 'folding' }
+      type21: { label: '3 Panel Folding Window', category: 'folding' },
+
+      // Casement Windows
+      'c-type1': { label: 'Single Casement Window', category: 'casement' },
+      'c-type2': { label: 'Double Casement Window', category: 'casement' },
+      'c-type3': { label: 'Casement with Fixed Top Light', category: 'casement' },
+      'c-type4': { label: 'Casement with Transom & Side Lights', category: 'casement' },
+      'c-type5': { label: 'Fixed Window', category: 'casement' },
+      'c-type6': { label: '4-Panel Casement Window', category: 'casement' },
+      'c-type7': { label: 'Top-Hung Casement Window', category: 'casement' }
     };
 
     // First check if we have a cart in URL
@@ -53,31 +62,86 @@ class CartManager {
     this.init();
   }
 
+  // ========== MOVED THESE METHODS OUTSIDE CONSTRUCTOR ==========
+  init() {
+    // Sync cart ID from localStorage if available
+    this.syncCartId();
+    this.loadCart();
+  }
+
+  syncCartId() {
+    const storedId = localStorage.getItem('persistentCartId');
+    const cookieId = this.getCookie('cartId');
+    const sessionId = sessionStorage.getItem('sessionCartId');
+    
+    if (storedId) {
+      // Use stored ID and ensure cookie matches
+      this.cartId = storedId;
+      if (!cookieId || cookieId !== storedId) {
+        document.cookie = `cartId=${storedId}; max-age=31536000; path=/; samesite=strict`;
+      }
+      if (!sessionId || sessionId !== storedId) {
+        sessionStorage.setItem('sessionCartId', storedId);
+      }
+    } else if (cookieId) {
+      this.cartId = cookieId;
+      localStorage.setItem('persistentCartId', cookieId);
+    } else if (sessionId) {
+      this.cartId = sessionId;
+      localStorage.setItem('persistentCartId', sessionId);
+    } else {
+      this.cartId = this.generateCartId();
+    }
+    
+    console.log('🛒 Cart ID synced:', this.cartId);
+  }
+  // ========== END OF MOVED METHODS ==========
+
   generateCartId() {
     try {
       const consent = localStorage.getItem('cookieConsent');
       
+      // First, check if there's an existing cart ID in localStorage (for persistence across pages)
+      const storedCartId = localStorage.getItem('persistentCartId');
+      if (storedCartId) {
+        console.log('🛒 Using stored cart ID:', storedCartId);
+        return storedCartId;
+      }
+      
       if (consent === 'rejected') {
-        if (!sessionStorage.getItem('sessionCartId')) {
-          sessionStorage.setItem('sessionCartId', `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+        // Use sessionStorage but also store in localStorage for persistence
+        let sessionId = sessionStorage.getItem('sessionCartId');
+        if (!sessionId) {
+          sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          sessionStorage.setItem('sessionCartId', sessionId);
+          localStorage.setItem('persistentCartId', sessionId);
         }
-        return sessionStorage.getItem('sessionCartId');
+        return sessionId;
       }
       
       // Check for existing cookie
       const existingCartId = this.getCookie('cartId');
       if (existingCartId) {
+        // Store in localStorage for persistence across pages
+        localStorage.setItem('persistentCartId', existingCartId);
         return existingCartId;
       }
       
-      // Create new cart ID and set cookie
+      // Create new cart ID and set cookie and localStorage
       const newCartId = `cart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      document.cookie = `cartId=${newCartId}; max-age=31536000; path=/; secure; samesite=strict`;
+      document.cookie = `cartId=${newCartId}; max-age=31536000; path=/; samesite=strict`;
+      localStorage.setItem('persistentCartId', newCartId);
       return newCartId;
       
     } catch (error) {
       console.warn('Storage access blocked, using session ID');
-      return `fallback-${Date.now()}`;
+      let fallbackId = sessionStorage.getItem('fallbackCartId');
+      if (!fallbackId) {
+        fallbackId = `fallback-${Date.now()}`;
+        sessionStorage.setItem('fallbackCartId', fallbackId);
+        localStorage.setItem('persistentCartId', fallbackId);
+      }
+      return fallbackId;
     }
   }
 
@@ -86,10 +150,6 @@ class CartManager {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
     return null;
-  }
-
-  init() {
-    this.loadCart();
   }
 
   async loadCart() {
@@ -124,6 +184,9 @@ class CartManager {
     try {
       console.log('🛒 cartManager.addToCart called with:', itemData);
       
+      // Ensure we have the latest cart ID
+      this.syncCartId();
+      
       const response = await fetch(this.backendUrl + '/api/cart', {
         method: 'POST',
         headers: {
@@ -137,7 +200,6 @@ class CartManager {
       
       const data = await response.json();
 
-      
       if (data.success) {
         console.log('✅ Item added to cart successfully');
         console.log('📊 Response structure:', {
@@ -354,7 +416,6 @@ class CartManager {
     cartPreview.innerHTML = html;
   }
 
-  // Add these helper methods to CartManager class
   getCategoryLabel(category) {
     const categoryLabels = {
       'sliding': 'Sliding Windows',
@@ -362,6 +423,7 @@ class CartManager {
       'hybrid': 'Hybrid Windows',
       'sliding-hybrid': 'Sliding Windows with Openable Top',
       'folding': 'Folding Windows',
+      'casement': 'Casement Windows',
       'doors': 'Aluminium Doors',
       'facades': 'Curtain Walling Facades',
       'partitions': 'Office Partitions',
@@ -378,6 +440,7 @@ class CartManager {
       'hybrid': '/img/labels/hybrid/',
       'sliding-hybrid': '/img/labels/hybrid/',
       'folding': '/img/labels/folding/',
+      'casement': '/img/labels/casement/',
       'doors': '/img/labels/doors/',
       'facades': '/img/labels/facades/',
       'partitions': '/img/labels/partitions/'

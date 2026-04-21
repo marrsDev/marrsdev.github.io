@@ -251,6 +251,16 @@ a {
     font-family: inherit;
 }
 
+.casement-vent-sizes input {
+    width: 60%; /* Full width within the <li> */
+    padding: 8px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #333;
+    color: #fff;
+    font-family: inherit;
+}
+
 .properties-field label {
     display: block; /* Ensure labels are on their own line */
     margin-bottom: 5px; /* Add spacing between label and input */
@@ -290,8 +300,22 @@ a {
 }
 
 
+/* Casement Type Selection Styles */
+.casement-type-selection-class {
+  font-family: 'Source Sans Pro', sans-serif;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+  border: 1px solid #5a5a5a;
+  border-radius: 8px;
+  overflow: hidden;
+}
 
-
+.select-casement-type {
+  padding: 5px;
+  text-align: center;
+  color: #7f8c8d;
+}
 
 /* Calculate cost section */
 .calculateCost {
