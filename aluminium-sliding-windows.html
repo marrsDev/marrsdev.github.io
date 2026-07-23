@@ -3,15 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aluminium Sliding Windows Cost Calculator | How to get an aluminium sliding windows quote| Benefits of sliding windows </title>
+    <title>Aluminium Windows Cost Calculator | Cost of aluminium windows in Kenya | Top 5 Benefits of Aluminium Windows </title>
     <link rel="stylesheet" href="css/styles-2.css">
+    <link rel="stylesheet" href="css/selectCss.css">
     <link rel="stylesheet" href="css/gallery-css.css">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="canonical" href="https://capitalbuilders.co.ke/" />
 
+  <meta name="description" content="Aluminium windows quotation tool that uses current glass prices in Kenya. Get instant quotes for high quality aluminium windows tailored to your needs.">
 
-  <meta name="description" content="Calculate the cost of aluminium windows and glass prices in Kenya with our user-friendly tool. Get instant quotes for high quality sliding windows tailored to your needs.">
-
-
+    <style>
+        .fade-message {
+            animation: fadeOut 10s ease-in-out forwards;
+            margin: 5px 0;
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+        
+        /* Sliding window type selector styles */
+        .select-sliding-type {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 10px 0 15px 0;
+            justify-content: flex-start;
+        }
+        
+        .select-sliding-type .image-option {
+            cursor: pointer;
+            border: 3px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .select-sliding-type .image-option:hover {
+            border-color: #2196F3;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+        }
+        
+        .select-sliding-type .image-option.selected {
+            border-color: #2196F3;
+            background: #e3f2fd;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+        }
+        
+        .select-sliding-type .image-option img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .select-sliding-type .option-label {
+            display: block;
+            font-size: 11px;
+            margin-top: 4px;
+            color: #555;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .select-sliding-type .image-option.selected .option-label {
+            color: #1976D2;
+        }
+        
+        /* Fixed height input styling */
+        .fixed-height-input-container {
+            display: none;
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            border-left: 3px solid #2196F3;
+        }
+        
+        .fixed-height-input-container.visible {
+            display: block;
+        }
+        
+        .fixed-height-input-container label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+        }
+        
+        .fixed-height-input-container input {
+            width: 120px;
+            padding: 6px 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .fixed-height-input-container input:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        
+        .fixed-height-input-container .help-text {
+            font-size: 11px;
+            color: #666;
+            margin-left: 10px;
+        }
+        
+        #fixed-height-warnings {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        #fixed-height-info {
+            color: #4caf50;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
 
 </head>
 
@@ -19,21 +137,20 @@
 
     <noscript>
         <style>
-            /* Remove display: none from #app so frontend is visible */
             .js-alert {
                 position: fixed;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                background: rgba(82, 87, 84, 1); /* Semi-transparent white */
+                background: rgba(82, 87, 84, 1);
                 border: 2px solid #ccc;
                 padding: 20px;
                 border-radius: 5px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 text-align: center;
                 font-family: Arial, sans-serif;
-                backdrop-filter: blur(5px); /* Frosted glass effect */
-                z-index: 10000; /* Ensure it's on top */
+                backdrop-filter: blur(5px);
+                z-index: 10000;
             }
 
             .js-alert h3 {
@@ -46,20 +163,17 @@
                 color: white;
                 line-height: 1.4;
             }
-            /* Optional: slightly dim the background content */
             .js-alert-overlay {
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.1); /* Very subtle overlay */
+                background: rgba(0,0,0,0.1);
                 z-index: 9999;
             }
         </style>
-        <!-- Subtle overlay -->
         <div class="js-alert-overlay"></div>
-        <!-- Alert popup -->
         <div class="js-alert">
             <h3>⚠️JavaScript is Disabled</h3>
             <p>This app requires JavaScript.</p>
@@ -71,14 +185,10 @@
 
     <div id="touchnav-wrapper">
 
-
-
     <header class="main-header">
         <div class="container">
             <nav class="main-navigation">
-            <!-- Hamburger Menu Icon -->
             <div class="hamburger-menu" onclick="toggleMenu()">☰</div>
-            <!-- Menu Items -->
             <ul class="menu">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="aluminium-sliding-windows.html">Sliding Windows</a></li>
@@ -129,6 +239,24 @@
             </li>
         </ul>
     </div>
+    <div class="properties-field">
+        <h4>>>> Select one design ↓</h4>
+        <div class="sliding-type-selection-class">
+            <div class="select-sliding-type" id="slidingTypeSelector">
+                <!-- Image options will be injected by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Fixed Height Input (shown for types that support it) -->
+        <div class="fixed-height-input-container" id="fixedHeightContainer">
+            <label>
+                Fixed Partition Height (mm):
+                <input type="number" id="fixedHeightInput" step="10" min="200" placeholder="Auto">
+                <span class="help-text">Leave blank for auto (500mm default)</span>
+            </label>
+            <div id="fixed-height-info"></div>
+            <div id="fixed-height-warnings"></div>
+        </div>
     <div class="properties-field">
         <h4>>>> Configure properties</h4>
         <ul>
@@ -777,10 +905,10 @@
 
     <script>
         // Heroku Backend Configuration commented out for development
-        // const HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
+        const HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
         
         // For local development
-        const HEROKU_BACKEND_URL = 'http://localhost:3000';
+        // const HEROKU_BACKEND_URL = 'http://localhost:3000';
         console.log('Backend URL configured:', HEROKU_BACKEND_URL);
     </script>
 
@@ -924,17 +1052,17 @@
         });
     </script>
 
-<script>
+<!-- <script>
     // Make backend URL globally accessible
     window.HEROKU_BACKEND_URL = 'http://localhost:3000';
     console.log('🌐 Backend URL set to:', window.HEROKU_BACKEND_URL);
-</script>
+</script> -->
 
-<!--     <script>
+    <script>
     // Make backend URL globally accessible
     window.HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
     console.log('🌐 Backend URL set to:', window.HEROKU_BACKEND_URL);
-</script> -->
+</script>
     
 <script>
 // Production-Optimized Network & Blocker Detection - CORRECTED FLOW
