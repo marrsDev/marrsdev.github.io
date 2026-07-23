@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aluminium Windows Cost Calculator | Cost of aluminium top hung windows in Kenya | Types of windows by operation </title>
     <link rel="stylesheet" href="css/styles-2.css">
+    <link rel="stylesheet" href="css/selectCss.css">
     <link rel="stylesheet" href="css/gallery-css.css">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
 
@@ -131,6 +132,14 @@
         </ul>
     </div>
     <div class="properties-field">
+
+        <div class="top-hung-type-selection-class">
+        <h4>>>> Select one design ↓</h4>
+        <div class="select-top-hung-type" id="topHungTypeSelector">
+            <!-- Image options will be injected by JavaScript -->
+        </div>
+        </div>
+
         <h4>>>> Configure properties</h4>
         <ul>
             <li class="profileColour">
@@ -179,6 +188,28 @@
                     <option value="10mmTuff">10mm Toughened</option>
                 </select>
             </li>
+
+            <li class="tophung-vent-inputs" id="topHungVentInputs" style="display: none;">
+                <div id="topHungVentWidthContainer" style="margin-bottom: 10px;">
+                    <label>Vent Width (mm):</label>
+                    <input type="number" id="topHungVentWidth" step="10">
+                    <small id="ventWidthHelp">Width of openable vent(s)</small>
+                </div>
+                <div id="topHungVentHeightContainer">
+                    <label>Vent Height (mm):</label>
+                    <input type="number" id="topHungVentHeight" step="10">
+                    <small id="ventHeightHelp">Height of openable vent(s)</small>
+                </div>
+            </li>
+            <li class="top-hung-vent-sizes">
+                <div style="font-size: 12px; color: #666; padding: 5px 0;">
+                💡 <strong>Vent sizes explained:</strong> The openable part(s) of your top‑hung window. If blank, defaults will be applied based on your selected window type.
+                </div>
+            </li>
+
+            <div id="top-hung-vent-info" style="color: #4caf50; font-size: 12px; margin-top: 5px;"></div>
+            <div id="top-hung-vent-warnings" style="color: #ff6b6b; font-size: 12px; margin-top: 5px;"></div>
+
             <li>
             <div class="calculateCost">
                 <button class="startButton">Calculate Cost</button>
@@ -578,13 +609,14 @@
 
     <script>
         // Heroku Backend Configuration commented out for development
-        const HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
+        // const HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
         
         // For local development
-        // const HEROKU_BACKEND_URL = 'http://localhost:3000';
-        // console.log('Backend URL configured:', HEROKU_BACKEND_URL);
+        const HEROKU_BACKEND_URL = 'http://localhost:3000';
+        console.log('Backend URL configured:', HEROKU_BACKEND_URL);
     </script>
 
+<script src="/js/selectJs.js" defer></script>
 <script src="/js/cartManager.js" defer></script>
 <script src="/js/cookieConsent.js" defer></script>
 <script src="/js/pinned-previews.js" defer></script>
@@ -745,11 +777,11 @@
     console.log('🌐 Backend URL set to:', window.HEROKU_BACKEND_URL);
 </script>
 
-    <script>
+<!--     <script>
     // Make backend URL globally accessible
     window.HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
     console.log('🌐 Backend URL set to:', window.HEROKU_BACKEND_URL);
-</script>
+</script> -->
     
 <script>
 // Production-Optimized Network & Blocker Detection - CORRECTED FLOW

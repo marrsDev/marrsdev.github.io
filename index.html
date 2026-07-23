@@ -5,12 +5,131 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aluminium Windows Cost Calculator | Cost of aluminium windows in Kenya | Top 5 Benefits of Aluminium Windows </title>
     <link rel="stylesheet" href="css/styles-2.css">
+    <link rel="stylesheet" href="css/selectCss.css">
     <link rel="stylesheet" href="css/gallery-css.css">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <link rel="canonical" href="https://capitalbuilders.co.ke/" />
 
   <meta name="description" content="Aluminium windows quotation tool that uses current glass prices in Kenya. Get instant quotes for high quality aluminium windows tailored to your needs.">
 
+    <style>
+        .fade-message {
+            animation: fadeOut 10s ease-in-out forwards;
+            margin: 5px 0;
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+        
+        /* Sliding window type selector styles */
+        .select-sliding-type {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 10px 0 15px 0;
+            justify-content: flex-start;
+        }
+        
+        .select-sliding-type .image-option {
+            cursor: pointer;
+            border: 3px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .select-sliding-type .image-option:hover {
+            border-color: #2196F3;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+        }
+        
+        .select-sliding-type .image-option.selected {
+            border-color: #2196F3;
+            background: #e3f2fd;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+        }
+        
+        .select-sliding-type .image-option img {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .select-sliding-type .option-label {
+            display: block;
+            font-size: 11px;
+            margin-top: 4px;
+            color: #555;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .select-sliding-type .image-option.selected .option-label {
+            color: #1976D2;
+        }
+        
+        /* Fixed height input styling */
+        .fixed-height-input-container {
+            display: none;
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            border-left: 3px solid #2196F3;
+        }
+        
+        .fixed-height-input-container.visible {
+            display: block;
+        }
+        
+        .fixed-height-input-container label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+        }
+        
+        .fixed-height-input-container input {
+            width: 120px;
+            padding: 6px 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .fixed-height-input-container input:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        
+        .fixed-height-input-container .help-text {
+            font-size: 11px;
+            color: #666;
+            margin-left: 10px;
+        }
+        
+        #fixed-height-warnings {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        #fixed-height-info {
+            color: #4caf50;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
 
 </head>
 
@@ -18,21 +137,20 @@
 
     <noscript>
         <style>
-            /* Remove display: none from #app so frontend is visible */
             .js-alert {
                 position: fixed;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                background: rgba(82, 87, 84, 1); /* Semi-transparent white */
+                background: rgba(82, 87, 84, 1);
                 border: 2px solid #ccc;
                 padding: 20px;
                 border-radius: 5px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 text-align: center;
                 font-family: Arial, sans-serif;
-                backdrop-filter: blur(5px); /* Frosted glass effect */
-                z-index: 10000; /* Ensure it's on top */
+                backdrop-filter: blur(5px);
+                z-index: 10000;
             }
 
             .js-alert h3 {
@@ -45,20 +163,17 @@
                 color: white;
                 line-height: 1.4;
             }
-            /* Optional: slightly dim the background content */
             .js-alert-overlay {
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0,0,0,0.1); /* Very subtle overlay */
+                background: rgba(0,0,0,0.1);
                 z-index: 9999;
             }
         </style>
-        <!-- Subtle overlay -->
         <div class="js-alert-overlay"></div>
-        <!-- Alert popup -->
         <div class="js-alert">
             <h3>⚠️JavaScript is Disabled</h3>
             <p>This app requires JavaScript.</p>
@@ -70,14 +185,10 @@
 
     <div id="touchnav-wrapper">
 
-
-
     <header class="main-header">
         <div class="container">
             <nav class="main-navigation">
-            <!-- Hamburger Menu Icon -->
             <div class="hamburger-menu" onclick="toggleMenu()">☰</div>
-            <!-- Menu Items -->
             <ul class="menu">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="aluminium-sliding-windows.html">Sliding Windows</a></li>
@@ -129,6 +240,24 @@
         </ul>
     </div>
     <div class="properties-field">
+        <h4>>>> Select one design ↓</h4>
+        <div class="sliding-type-selection-class">
+            <div class="select-sliding-type" id="slidingTypeSelector">
+                <!-- Image options will be injected by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Fixed Height Input (shown for types that support it) -->
+        <div class="fixed-height-input-container" id="fixedHeightContainer">
+            <label>
+                Fixed Partition Height (mm):
+                <input type="number" id="fixedHeightInput" step="10" min="200" placeholder="Auto">
+                <span class="help-text">Leave blank for auto (500mm default)</span>
+            </label>
+            <div id="fixed-height-info"></div>
+            <div id="fixed-height-warnings"></div>
+        </div>
+
         <h4>>>> Configure properties</h4>
         <ul>
             <li class="profileColour">
@@ -140,25 +269,6 @@
                     <option value="brown">Brown</option>
                     <option value="champagne">Champagne</option>
                     <option value="grey">Grey</option>
-                </select>
-            </li>
-            <li class="noOfPanels">
-                <label>Number of panels:</label>
-                <select id="noOfPanels">
-                    <option value="2">2 panels</option>
-                    <option value="3">3 panels</option>
-                    <option value="4">4 panels</option>
-                </select>
-            </li>
-            <li class="fixedPartition">
-                <label>With/Without Fixed partition:</label>
-                <select id="fixedPartition">
-                    <option value="noPartition">No Fixed Partition</option>
-                    <option value="doubleFixed">Top & Bottom</option>
-                    <option value="fixedTop">Fixed Top</option>
-                    <option value="fixedBottom">Fixed Bottom</option>
-                    <option value="openAbleTopFxBtm">Openable Top 1</option>
-                    <option value="openAbleTop">Openable Top 2</option>
                 </select>
             </li>
             <li class="glassType">
@@ -189,7 +299,7 @@
             <li>
             <div class="calculateCost">
                 <button class="startButton">Calculate Cost</button>
-                <input type="text" id="cost" readonly> <!-- Add `readonly` if the input is not editable -->
+                <input type="text" id="cost" readonly>
             </div>                
             </li>
             <li>
@@ -562,12 +672,10 @@
 
 <footer class="main-footer">
     <div class="container">
-        <!-- Copyright Section -->
         <div class="copyright-section">
             <p>&copy; <span id="copyright-year"></span> Capital Builders. All rights reserved.</p>
         </div>
 
-        <!-- Social Media Links -->
         <div class="social-media-links">
             <a href="https://twitter.com/CapitalAllu" target="_blank" aria-label="Twitter">
                 <img src="img/icons/fa-twitter.png" alt="Twitter">
@@ -594,7 +702,6 @@
 
 </footer>
 
-<!-- JavaScript to update the copyright year dynamically -->
 <script>
     document.getElementById('copyright-year').textContent = new Date().getFullYear();
 </script>
@@ -612,13 +719,15 @@
 
     <script>
         // Heroku Backend Configuration
-        const HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
+        // const HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
         
         // For local development
-        // const HEROKU_BACKEND_URL = 'http://localhost:3000';
+
+        const HEROKU_BACKEND_URL = 'http://localhost:3000';
         console.log('Backend URL configured:', HEROKU_BACKEND_URL);
     </script>
 
+<script src="/js/selectJs.js" defer></script>
 <script src="/js/cartManager.js" defer></script>
 <script src="/js/cookieConsent.js" defer></script>
 <script src="/js/pinned-previews.js" defer></script>
@@ -651,7 +760,7 @@
             constructor() {
                 this.backendReady = false;
                 this.warmUpAttempts = 0;
-                this.maxAttempts = 12; // 2 minutes total
+                this.maxAttempts = 12;
                 this.init();
             }
 
@@ -665,7 +774,6 @@
                 const statusEl = document.getElementById('backend-status');
                 statusEl.style.display = 'block';
                 
-                // Auto-hide after 2 minutes
                 setTimeout(() => {
                     if (!this.backendReady) {
                         statusEl.style.display = 'none';
@@ -685,10 +793,8 @@
             }
 
             startAggressiveWarming() {
-                // Immediate call
                 this.pingBackend();
                 
-                // Call every 10 seconds for 2 minutes
                 this.interval = setInterval(() => {
                     if (!this.backendReady && this.warmUpAttempts < this.maxAttempts) {
                         this.pingBackend();
@@ -699,7 +805,6 @@
             }
 
             setupUserInteractionWarming() {
-                // Warm up on any user interaction
                 const warmEvents = ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'];
                 
                 warmEvents.forEach(eventType => {
@@ -710,7 +815,6 @@
                     }, { once: false });
                 });
 
-                // Form field specific warming
                 this.setupFormFieldWarming();
             }
 
@@ -753,19 +857,16 @@
             }
         }
 
-        // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             new HerokuBackendWarmer();
         });
     </script>
 <script>
-    // Make backend URL globally accessible
-    window.HEROKU_BACKEND_URL = 'https://dynamicamazement-d1e43569e1df.herokuapp.com';
+    window.HEROKU_BACKEND_URL = 'http://localhost:3000';
     console.log('🌐 Backend URL set to:', window.HEROKU_BACKEND_URL);
 </script>
     
 <script>
-// Production-Optimized Network & Blocker Detection - CORRECTED FLOW
 class ProductionDetector {
     constructor() {
         this.backendStatus = 'unknown';
@@ -775,15 +876,12 @@ class ProductionDetector {
     }
 
     async init() {
-        // STEP 1: First check backend connectivity
         await this.testBackendConnection();
         
-        // STEP 2: Only check for blockers if backend is having issues
         if (this.backendStatus !== 'ready') {
             this.checkForCommonBlockers();
         }
         
-        // STEP 3: Start continuous monitoring
         this.monitorBackend();
         
         setTimeout(() => this.reportProductionStatus(), 2000);
@@ -799,9 +897,8 @@ class ProductionDetector {
             attempts++;
             await this.testBackendConnection();
             
-            // STEP 4: Only check for blockers if backend continues to fail
             if (attempts >= 2 && this.backendStatus !== 'ready') {
-                this.checkForCommonBlockers(); // Re-check blockers
+                this.checkForCommonBlockers();
                 this.showProductionWarnings();
             }
             
@@ -829,7 +926,7 @@ class ProductionDetector {
             
             if (response.ok) {
                 this.backendStatus = 'ready';
-                this.hideAllWarnings(); // Hide any existing warnings when backend becomes ready
+                this.hideAllWarnings();
             }
         } catch (error) {
             if (error.name === 'AbortError') {
@@ -843,13 +940,9 @@ class ProductionDetector {
     showProductionWarnings() {
         this.hideAllWarnings();
         
-        // STEP 5: ONLY show blocker warning if:
-        // 1. Blockers are detected AND 
-        // 2. Backend has clear connection failures (not just warming)
         if (this.detectedBlockers.length > 0 && this.backendStatus === 'connection_failed') {
             this.showBlockerWarning();
         }
-        // Otherwise, rely on the backend status element to show warming messages
     }
 
     showBlockerWarning() {
@@ -891,9 +984,21 @@ class ProductionDetector {
         if (existing) existing.remove();
     }
 
-    // ... rest of the methods same as before
     checkForCommonBlockers() {
-        // Same implementation as before
+        // Check for common ad blockers
+        if (window.adblockDetected) {
+            this.detectedBlockers.push('adblock');
+        }
+        
+        // Check for Brave browser
+        if (navigator.brave && navigator.brave.isBrave) {
+            this.detectedBlockers.push('brave');
+        }
+        
+        // Check if fetch is blocked (through previous failures)
+        if (this.backendStatus === 'connection_failed') {
+            this.detectedBlockers.push('fetch-blocked');
+        }
     }
     
     reportProductionStatus() {
@@ -904,7 +1009,6 @@ class ProductionDetector {
     }
 }
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Initializing Production Detector - CORRECTED FLOW');
     new ProductionDetector();
@@ -916,15 +1020,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
