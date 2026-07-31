@@ -334,7 +334,7 @@ function initSlidingSelection() {
 }
 
 // ============================================
-// FIXED HEIGHT VALIDATION
+// FIXED HEIGHT VALIDATION (UI Help Text Only)
 // ============================================
 function validateFixedHeight(totalHeight) {
     const fixedHeightInput = document.getElementById('fixedHeightInput');
@@ -351,11 +351,28 @@ function validateFixedHeight(totalHeight) {
     warningsDiv.innerHTML = '';
     infoDiv.innerHTML = '';
     
+    // Check if this is a double fixed type (UI display purposes only)
+    const isDoubleFixed = selectedSlidingType.typeKey === 'type3' || 
+                         selectedSlidingType.typeKey === 'type6' || 
+                         selectedSlidingType.typeKey === 'type9' || 
+                         selectedSlidingType.typeKey === 'type10' || 
+                         selectedSlidingType.typeKey === 'type11' || 
+                         selectedSlidingType.typeKey === 'type12';
+    
     // If no value entered, use default 500mm
     if (rawValue === '') {
-        infoDiv.innerHTML = 'ℹ️ Using default fixed height: 500mm';
-        currentFixedHeight = 500;
-        return 500;
+        const defaultFixedHeight = 500;
+        const totalFixedHeight = isDoubleFixed ? defaultFixedHeight * 2 : defaultFixedHeight;
+        const openableHeight = totalHeight - totalFixedHeight;
+        
+        // UI help text only - calculation logic still uses fixedHeight correctly in calculationService.js
+        if (isDoubleFixed) {
+            infoDiv.innerHTML = `ℹ️ Using default fixed height: ${defaultFixedHeight}mm each (${totalFixedHeight}mm total fixed). Sliding section: ${openableHeight}mm = ${(openableHeight/totalHeight*100).toFixed(0)}% of total`;
+        } else {
+            infoDiv.innerHTML = `ℹ️ Using default fixed height: ${defaultFixedHeight}mm. Sliding section: ${openableHeight}mm = ${(openableHeight/totalHeight*100).toFixed(0)}% of total`;
+        }
+        currentFixedHeight = defaultFixedHeight;
+        return defaultFixedHeight;
     }
     
     const fixedHeight = parseInt(rawValue);
@@ -365,12 +382,18 @@ function validateFixedHeight(totalHeight) {
         return null;
     }
     
-    // Validate that newHeight (totalHeight - fixedHeight) is at least 60% of totalHeight
-    const newHeight = totalHeight - fixedHeight;
-    const minNewHeight = totalHeight * 0.6;
+    // Calculate total fixed height for UI display only
+    const totalFixedHeight = isDoubleFixed ? fixedHeight * 2 : fixedHeight;
+    const openableHeight = totalHeight - totalFixedHeight;
+    const minOpenableHeight = totalHeight * 0.6;
     
-    if (newHeight < minNewHeight) {
-        warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm is too large. The openable section would be only ${newHeight}mm (${(newHeight/totalHeight*100).toFixed(0)}% of total). Minimum openable height is ${Math.round(minNewHeight)}mm (60% of total).`;
+    // Validate that openable section is at least 60% of total height (UI warning only)
+    if (openableHeight < minOpenableHeight) {
+        if (isDoubleFixed) {
+            warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm each (${totalFixedHeight}mm total) is too large. The sliding section would be only ${openableHeight}mm (${(openableHeight/totalHeight*100).toFixed(0)}% of total). Please select a different design or reduce the 'Fixed Height input.'`;
+        } else {
+            warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm is too large. The sliding section would be only ${openableHeight}mm (${(openableHeight/totalHeight*100).toFixed(0)}% of total). Please select a different design or reduce the 'Fixed Height input'.`;
+        }
         return null;
     }
     
@@ -379,14 +402,25 @@ function validateFixedHeight(totalHeight) {
         return null;
     }
     
+    // Warn if fixed height exceeds 40% of total (UI warning only)
     if (fixedHeight > totalHeight * 0.4) {
-        warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm exceeds 40% of total height. Consider a smaller fixed section.`;
+        if (isDoubleFixed) {
+            warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm each exceeds 40% of total height per section. Consider a smaller fixed section.`;
+        } else {
+            warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm exceeds 40% of total height. Consider a smaller fixed section.`;
+        }
         // Still allow it but warn
     }
     
-    infoDiv.innerHTML = `✅ Using fixed height: ${fixedHeight}mm (openable section: ${newHeight}mm = ${(newHeight/totalHeight*100).toFixed(0)}% of total)`;
+    // Success message with details (UI help text only)
+    if (isDoubleFixed) {
+        infoDiv.innerHTML = `✅ Using fixed height: ${fixedHeight}mm each (${totalFixedHeight}mm total fixed). Sliding section: ${openableHeight}mm = ${(openableHeight/totalHeight*100).toFixed(0)}% of total`;
+    } else {
+        infoDiv.innerHTML = `✅ Using fixed height: ${fixedHeight}mm. Sliding section: ${openableHeight}mm = ${(openableHeight/totalHeight*100).toFixed(0)}% of total`;
+    }
+    
     currentFixedHeight = fixedHeight;
-    return fixedHeight;
+    return fixedHeight; // This value is passed to the calculation, and calculationService.js handles the multiplication
 }
 
 // ============================================
