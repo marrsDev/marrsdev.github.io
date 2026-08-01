@@ -177,15 +177,32 @@ document.addEventListener('DOMContentLoaded', function() {
             return null;
         }
         
-        // Validate fixed height if provided
-        if (fixedHeight !== null && !isNaN(fixedHeight)) {
-            const newHeight = height - fixedHeight;
-            const minNewHeight = height * 0.6;
-            if (newHeight < minNewHeight) {
-                alert(`Fixed height of ${fixedHeight}mm is too large. The openable section would be only ${newHeight}mm (${(newHeight/height*100).toFixed(0)}% of total). Minimum openable height is ${Math.round(minNewHeight)}mm (60% of total).`);
-                return null;
-            }
+// Validate fixed height if provided
+if (fixedHeight !== null && !isNaN(fixedHeight)) {
+    // Check if this is a double fixed type
+    const isDoubleFixed = selectedTypeKey === 'type3' || 
+                         selectedTypeKey === 'type6' || 
+                         selectedTypeKey === 'type9' || 
+                         selectedTypeKey === 'type10' || 
+                         selectedTypeKey === 'type11' || 
+                         selectedTypeKey === 'type12';
+    
+    // Calculate total fixed height
+    const totalFixedHeight = isDoubleFixed ? fixedHeight * 2 : fixedHeight;
+    const openableHeight = height - totalFixedHeight;
+    
+    // Different minimums for single vs double fixed
+    const minOpenableHeight = isDoubleFixed ? height * 0.5 : height * 0.6;
+    
+    if (openableHeight < minOpenableHeight) {
+        if (isDoubleFixed) {
+            alert(`Fixed height of ${fixedHeight}mm each (${totalFixedHeight}mm total) is too large. The sliding section would be only ${openableHeight}mm (${(openableHeight/height*100).toFixed(0)}% of total). Please select a different design or reduce the 'Fixed Height input'.`);
+        } else {
+            alert(`Fixed height of ${fixedHeight}mm is too large. The sliding section would be only ${openableHeight}mm (${(openableHeight/height*100).toFixed(0)}% of total). Please select a different design or reduce the 'Fixed Height input'.`);
         }
+        return null;
+    }
+}
         
         console.log('Calculating sliding window cost:', {
             height, width, profileColour, selectedTypeKey, fixedHeight, glassType, glassThickness

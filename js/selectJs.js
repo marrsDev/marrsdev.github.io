@@ -364,12 +364,17 @@ function validateFixedHeight(totalHeight) {
         const defaultFixedHeight = 500;
         const totalFixedHeight = isDoubleFixed ? defaultFixedHeight * 2 : defaultFixedHeight;
         const openableHeight = totalHeight - totalFixedHeight;
+        const minOpenableHeight = isDoubleFixed ? totalHeight * 0.5 : totalHeight * 0.6;
         
         // UI help text only - calculation logic still uses fixedHeight correctly in calculationService.js
         if (isDoubleFixed) {
-            infoDiv.innerHTML = `ℹ️ Using default fixed height: ${defaultFixedHeight}mm each (${totalFixedHeight}mm total fixed). Sliding section: ${openableHeight}mm = ${(openableHeight/totalHeight*100).toFixed(0)}% of total`;
+            if (openableHeight < minOpenableHeight) {
+                infoDiv.innerHTML = `ℹ️ Default fixed height of ${defaultFixedHeight}mm each (${totalFixedHeight}mm total) results in ${openableHeight}mm (${(openableHeight/totalHeight*100).toFixed(0)}% of total) openable. Consider increasing window height or reducing fixed height.`;
+            } else {
+                infoDiv.innerHTML = `ℹ️ Using default fixed height: ${defaultFixedHeight}mm each (${totalFixedHeight}mm total fixed). Openable section: ${openableHeight}mm = ${(openableHeight/totalHeight*100).toFixed(0)}% of total`;
+            }
         } else {
-            infoDiv.innerHTML = `ℹ️ Using default fixed height: ${defaultFixedHeight}mm. Sliding section: ${openableHeight}mm = ${(openableHeight/totalHeight*100).toFixed(0)}% of total`;
+            infoDiv.innerHTML = `ℹ️ Using default fixed height: ${defaultFixedHeight}mm. Openable section: ${openableHeight}mm = ${(openableHeight/totalHeight*100).toFixed(0)}% of total`;
         }
         currentFixedHeight = defaultFixedHeight;
         return defaultFixedHeight;
@@ -385,14 +390,14 @@ function validateFixedHeight(totalHeight) {
     // Calculate total fixed height for UI display only
     const totalFixedHeight = isDoubleFixed ? fixedHeight * 2 : fixedHeight;
     const openableHeight = totalHeight - totalFixedHeight;
-    const minOpenableHeight = totalHeight * 0.6;
+    const minOpenableHeight = isDoubleFixed ? totalHeight * 0.5 : totalHeight * 0.6;
     
-    // Validate that openable section is at least 60% of total height (UI warning only)
+    // Validate that openable section is at least the minimum (50% for double, 60% for single)
     if (openableHeight < minOpenableHeight) {
         if (isDoubleFixed) {
-            warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm each (${totalFixedHeight}mm total) is too large. The sliding section would be only ${openableHeight}mm (${(openableHeight/totalHeight*100).toFixed(0)}% of total). Please select a different design or reduce the 'Fixed Height input.'`;
+            warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm each (${totalFixedHeight}mm total) is too large. The sliding section would be only ${openableHeight}mm (${(openableHeight/totalHeight*100).toFixed(0)}% of total). Minimum openable height is ${Math.round(minOpenableHeight)}mm (50% of total).`;
         } else {
-            warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm is too large. The sliding section would be only ${openableHeight}mm (${(openableHeight/totalHeight*100).toFixed(0)}% of total). Please select a different design or reduce the 'Fixed Height input'.`;
+            warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm is too large. The sliding section would be only ${openableHeight}mm (${(openableHeight/totalHeight*100).toFixed(0)}% of total). Minimum openable height is ${Math.round(minOpenableHeight)}mm (60% of total).`;
         }
         return null;
     }
@@ -420,7 +425,7 @@ function validateFixedHeight(totalHeight) {
     }
     
     currentFixedHeight = fixedHeight;
-    return fixedHeight; // This value is passed to the calculation, and calculationService.js handles the multiplication
+    return fixedHeight;
 }
 
 // ============================================
