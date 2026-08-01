@@ -93,42 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    const topHungTypeSelect = document.getElementById('topHungWindowType');
-    if (topHungTypeSelect) {
-        const totalHeight = parseInt(document.getElementById('heightId')?.value || 0);
-        const totalWidth = parseInt(document.getElementById('widthId')?.value || 0);
-        
-        validateTopHungDimensions(
-            topHungTypeSelect.value,
-            null, null,
-            totalWidth || 0,
-            totalHeight || 0
-        );
-        
-        topHungTypeSelect.addEventListener('change', function() {
-            const totalHeight = parseInt(document.getElementById('heightId')?.value || 0);
-            const totalWidth = parseInt(document.getElementById('widthId')?.value || 0);
-            
-            const ventWidthInput = document.getElementById('topHungVentWidth');
-            const ventHeightInput = document.getElementById('topHungVentHeight');
-            if (ventWidthInput) ventWidthInput.value = '';
-            if (ventHeightInput) ventHeightInput.value = '';
-            
-            if (window.ventClearTimeout) {
-                clearTimeout(window.ventClearTimeout);
-                window.ventClearTimeout = null;
-            }
-            
-            validateTopHungDimensions(
-                this.value,
-                null, null,
-                totalWidth || 0,
-                totalHeight || 0
-            );
-            
-            updatePreview();
-        });
-    }
 
     // Initialize preview based on page type
     updatePreview();
@@ -144,7 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const glassType = document.getElementById('glassType')?.value || 'clear';
         const glassThickness = document.getElementById('glassThickness')?.value || '4mm';
         
-        // CRITICAL FIX: Use the global window property that selectJs updates
         let selectedTypeKey = window.selectedSlidingTypeKey || null;
         
         // Log the current selection for debugging
@@ -269,8 +232,15 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
         const glassType = document.getElementById('glassType')?.value || 'clear';
         const glassThickness = document.getElementById('glassThickness')?.value || '4mm';
         
-        // Get top-hung window type
-        const topHungWindowType = document.getElementById('topHungWindowType')?.value || 'singlePanel';
+        // Get top-hung window type - USE the image selector selection
+        let topHungWindowType = window.selectedTopHungType || 'doublePanel';
+        console.log(`🔑 Selected top-hung type from window: ${topHungWindowType}`);
+        
+        // If no type selected yet, default to doublePanel
+        if (!topHungWindowType) {
+            console.log('⚠️ No top-hung type selected, defaulting to doublePanel');
+            topHungWindowType = 'doublePanel';
+        }
         
         // Get raw vent dimensions (user input or null)
         let rawVentWidth = document.getElementById('topHungVentWidth')?.value;
@@ -1042,18 +1012,33 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
         const currentPage = getCurrentPageType();
         const noOfPanels = document.getElementById('noOfPanels')?.value || '2';
         const fixedPartition = document.getElementById('fixedPartition')?.value || 'noPartition';
-        const topHungWindowType = document.getElementById('topHungWindowType')?.value;
+        // REMOVE this: const topHungWindowType = document.getElementById('topHungWindowType')?.value;
         
         let imageName = 'type-1'; // default
         
         if (currentPage === 'topHung') {
-            // Handle top-hung windows
-            if (topHungWindowType === 'doublePanel') imageName = 'type-13';
-            else if (topHungWindowType === 'singlePanel') imageName = 'type-12';
-            else if (topHungWindowType === 'customLight') imageName = 'type-15';
-            else if (topHungWindowType === 'centerHung') imageName = 'type-16';
-            else if (topHungWindowType === 'fixedLight') imageName = 'type-69';
-            else if (topHungWindowType === 'fixedLight2') imageName = 'type-69';
+            // Handle top-hung windows - USE the image selector selection
+            const selectedTopHungType = window.selectedTopHungType || null;
+            console.log(`🔄 updatePreview: selectedTopHungType from window: ${selectedTopHungType}`);
+            
+            // Map selected type to image name
+            const topHungPreviewMap = {
+                'singlePanel': 'type-12',
+                'doublePanel': 'type-13',
+                'customLight': 'type-15',
+                'centerHung': 'type-16',
+                'fixedLight': 'type-69',
+                'fixedLight2': 'type-69'
+            };
+            
+            if (selectedTopHungType && topHungPreviewMap[selectedTopHungType]) {
+                imageName = topHungPreviewMap[selectedTopHungType];
+                console.log(`🔄 updatePreview: Using image selector mapping: ${selectedTopHungType} -> ${imageName}`);
+            } else {
+                // Fallback to default
+                imageName = 'type-13';
+            }
+
         } else if (currentPage === 'casement') {
             // Handle casement windows
             const selectedImage = document.querySelector('.image-option.selected');

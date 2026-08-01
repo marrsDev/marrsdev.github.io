@@ -633,6 +633,8 @@ function selectTopHungType(type, element) {
     element.classList.add('selected');
     selectedTopHungType = type;
     
+    window.selectedTopHungType = type.value;
+    
     const topHungDropdown = document.getElementById('topHungWindowType');
     if (topHungDropdown && type.value) {
         topHungDropdown.value = type.value;
@@ -641,6 +643,7 @@ function selectTopHungType(type, element) {
     }
     
     console.log(`Selected top-hung type: ${type.value} - ${type.label}`);
+    console.log(`🔄 window.selectedTopHungType set to: ${window.selectedTopHungType}`);
     
     const event = new CustomEvent('topHungChanged', { 
         detail: { type: type.value, label: type.label }
