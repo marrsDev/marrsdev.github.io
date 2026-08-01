@@ -334,6 +334,133 @@ function initSlidingSelection() {
 }
 
 // ============================================
+// AUTO-SCROLL NUDGE (Discoverability Feature)
+// ============================================
+
+// Store pending nudges that are waiting for cookie consent
+let pendingNudges = [];
+
+function nudgeScrollableSelector(selectorId, delay = 1000) {
+    const selector = document.getElementById(selectorId);
+    if (!selector) return;
+    
+    // Only nudge if the content is actually scrollable
+    const isScrollable = selector.scrollWidth > selector.clientWidth;
+    if (!isScrollable) return;
+    
+    // Check if user has already interacted with this selector
+    const hasInteracted = sessionStorage.getItem(`nudge_${selectorId}`);
+    if (hasInteracted) return;
+    
+    // Check if cookie consent is resolved
+    const consentGiven = localStorage.getItem('cookieConsent');
+    const cookieElement = document.getElementById('cookie-consent');
+    const isCookieVisible = cookieElement && cookieElement.style.display !== 'none';
+    
+    // If cookie consent is pending (banner visible), wait for it
+    if (!consentGiven || isCookieVisible) {
+        console.log(`⏳ Nudge for ${selectorId} waiting for cookie consent...`);
+        // Store the nudge to be executed later
+        pendingNudges.push({ selectorId, delay });
+        return;
+    }
+    
+    // Cookie consent resolved, trigger nudge
+    setTimeout(() => {
+        performNudge(selector, selectorId);
+    }, delay);
+}
+
+// Execute the actual nudge animation
+function performNudge(selector, selectorId) {
+    // Store that we've nudged this selector
+    sessionStorage.setItem(`nudge_${selectorId}`, 'true');
+    console.log(`🔄 Performing nudge for ${selectorId}`);
+    
+    const nudgeDistance = 35;
+    
+    // Step 1: Scroll right
+    selector.scrollBy({
+        left: nudgeDistance,
+        behavior: 'smooth'
+    });
+    
+    // Step 2: After a short pause, scroll back to original position
+    setTimeout(() => {
+        selector.scrollBy({
+            left: -nudgeDistance,
+            behavior: 'smooth'
+        });
+    }, 400);
+    
+    // Step 3: Add a subtle highlight effect to draw attention
+    selector.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+    selector.style.boxShadow = '0 0 0 2px rgba(52, 152, 219, 0.3)';
+    selector.style.borderColor = '#3498db';
+    
+    // Remove highlight after animation completes
+    setTimeout(() => {
+        selector.style.boxShadow = '';
+        selector.style.borderColor = '';
+    }, 1200);
+}
+
+// Listen for cookie consent resolution event
+document.addEventListener('cookieConsentResolved', function(e) {
+    console.log(`🍪 Cookie consent resolved: ${e.detail.status}, processing pending nudges...`);
+    
+    // Process all pending nudges
+    if (pendingNudges.length > 0) {
+        pendingNudges.forEach((nudge, index) => {
+            // Stagger the nudges slightly so they don't all fire at once
+            const staggerDelay = index * 300 + 500;
+            setTimeout(() => {
+                const selector = document.getElementById(nudge.selectorId);
+                if (selector) {
+                    // Check again if still scrollable and not already nudged
+                    const isScrollable = selector.scrollWidth > selector.clientWidth;
+                    const hasInteracted = sessionStorage.getItem(`nudge_${nudge.selectorId}`);
+                    if (isScrollable && !hasInteracted) {
+                        performNudge(selector, nudge.selectorId);
+                    }
+                }
+            }, staggerDelay);
+        });
+        // Clear pending nudges after processing
+        pendingNudges = [];
+    }
+});
+
+// Also handle the case where DOM loads after cookie consent
+// Check if cookie consent is already resolved when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    const consentGiven = localStorage.getItem('cookieConsent');
+    const cookieElement = document.getElementById('cookie-consent');
+    const isCookieVisible = cookieElement && cookieElement.style.display !== 'none';
+    
+    // If consent is already given and banner is hidden, process any pending nudges
+    if (consentGiven && !isCookieVisible && pendingNudges.length > 0) {
+        console.log('🍪 Cookie already resolved on DOM load, processing pending nudges...');
+        setTimeout(() => {
+            pendingNudges.forEach((nudge, index) => {
+                const staggerDelay = index * 300 + 500;
+                setTimeout(() => {
+                    const selector = document.getElementById(nudge.selectorId);
+                    if (selector) {
+                        const isScrollable = selector.scrollWidth > selector.clientWidth;
+                        const hasInteracted = sessionStorage.getItem(`nudge_${nudge.selectorId}`);
+                        if (isScrollable && !hasInteracted) {
+                            performNudge(selector, nudge.selectorId);
+                        }
+                    }
+                }, staggerDelay);
+            });
+            pendingNudges = [];
+        }, 800);
+    }
+});
+
+// ============================================
 // FIXED HEIGHT VALIDATION (UI Help Text Only)
 // ============================================
 function validateFixedHeight(totalHeight) {
@@ -591,17 +718,21 @@ function syncDropdownWithImageSelection() {
 }
 
 // ============================================
-// INITIALIZATION
+// INITIALIZATION (UPDATED)
 // ============================================
 function initAllSelections() {
     // Initialize based on which selector exists on the page
     if (document.getElementById('casementTypeSelector')) {
         initCasementSelection();
+        // Nudge after a short delay for casement - cookie aware
+        setTimeout(() => nudgeScrollableSelector('casementTypeSelector', 800), 1200);
     }
     
     if (document.getElementById('topHungTypeSelector')) {
         initTopHungSelection();
         syncDropdownWithImageSelection();
+        // Nudge after a short delay for top-hung - cookie aware
+        setTimeout(() => nudgeScrollableSelector('topHungTypeSelector', 800), 1200);
     }
     
     if (document.getElementById('slidingTypeSelector')) {
@@ -631,6 +762,9 @@ function initAllSelections() {
                 }
             });
         }
+        
+        // Nudge after a short delay for sliding - cookie aware
+        setTimeout(() => nudgeScrollableSelector('slidingTypeSelector', 800), 1200);
     }
 }
 

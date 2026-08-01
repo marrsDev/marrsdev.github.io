@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Maintaining cookie rejection state');
             document.cookie = 'cartId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         }
+        
+        // Cookie consent already resolved - dispatch event for nudge
+        document.dispatchEvent(new CustomEvent('cookieConsentResolved', { 
+            detail: { status: consentGiven } 
+        }));
     }
 });
 
@@ -38,6 +43,11 @@ window.acceptCookies = function() {
     }
     
     console.log('Cookies accepted - cart functionality enabled');
+    
+    // Dispatch event for nudge and other dependent features
+    document.dispatchEvent(new CustomEvent('cookieConsentResolved', { 
+        detail: { status: 'accepted' } 
+    }));
 }
 
 // Function to handle cookie rejection - attached to window for global access
@@ -53,4 +63,14 @@ window.rejectCookies = function() {
     // Clear any existing cookies if rejected
     document.cookie = 'cartId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     console.log('Cookies rejected - cart cookie cleared');
+    
+    // Dispatch event for nudge and other dependent features
+    document.dispatchEvent(new CustomEvent('cookieConsentResolved', { 
+        detail: { status: 'rejected' } 
+    }));
+}
+
+// Also add a helper function to check if cookie consent is resolved
+window.isCookieConsentResolved = function() {
+    return localStorage.getItem('cookieConsent') !== null;
 }
