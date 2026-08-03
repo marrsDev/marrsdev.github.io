@@ -141,6 +141,31 @@
         </div>
 
         <h4>>>> Configure properties</h4>
+
+
+        <!-- Vent Inputs (shown for types that support them) -->
+        <div class="fixed-height-input-container" id="ventInputsContainer" style="display: none;">
+            <div id="ventWidthContainer" style="margin-bottom: 10px;">
+                <label>
+                    Vent Width (mm):
+                    <input type="number" id="topHungVentWidth" step="10" min="200" placeholder="Auto">
+                    <span class="help-text" id="ventWidthHelp">Leave blank for auto</span>
+                </label>
+            </div>
+            <div id="ventHeightContainer">
+                <label>
+                    Vent Height (mm):
+                    <input type="number" id="topHungVentHeight" step="10" min="200" placeholder="Auto">
+                    <span class="help-text" id="ventHeightHelp">Leave blank for auto</span>
+                </label>
+            </div>
+            <div id="top-hung-vent-info" style="color: #4caf50; font-size: 12px; margin-top: 5px;"></div>
+            <div id="top-hung-vent-warnings" style="color: #ff6b6b; font-size: 12px; margin-top: 5px;"></div>
+            <div style="font-size: 12px; color: #666; padding: 5px 0;">
+            </div>
+        </div>
+
+
         <ul>
             <li class="profileColour">
                 <label>Aluminium colour:</label>
@@ -178,27 +203,6 @@
                     <option value="10mmTuff">10mm Toughened</option>
                 </select>
             </li>
-
-            <li class="tophung-vent-inputs" id="topHungVentInputs" style="display: none;">
-                <div id="topHungVentWidthContainer" style="margin-bottom: 10px;">
-                    <label>Vent Width (mm):</label>
-                    <input type="number" id="topHungVentWidth" step="10">
-                    <small id="ventWidthHelp">Width of openable vent(s)</small>
-                </div>
-                <div id="topHungVentHeightContainer">
-                    <label>Vent Height (mm):</label>
-                    <input type="number" id="topHungVentHeight" step="10">
-                    <small id="ventHeightHelp">Height of openable vent(s)</small>
-                </div>
-            </li>
-            <li class="top-hung-vent-sizes">
-                <div style="font-size: 12px; color: #666; padding: 5px 0;">
-                💡 <strong>Vent sizes explained:</strong> The openable part(s) of your top‑hung window. If blank, defaults will be applied based on your selected window type.
-                </div>
-            </li>
-
-            <div id="top-hung-vent-info" style="color: #4caf50; font-size: 12px; margin-top: 5px;"></div>
-            <div id="top-hung-vent-warnings" style="color: #ff6b6b; font-size: 12px; margin-top: 5px;"></div>
 
             <li>
             <div class="calculateCost">

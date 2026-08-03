@@ -623,37 +623,43 @@ function initCasementSelection() {
 // ============================================
 // TOP-HUNG SELECTION
 // ============================================
-let selectedTopHungType = null;
+    let selectedTopHungType = null;
 
-function selectTopHungType(type, element) {
-    document.querySelectorAll('#topHungTypeSelector .image-option').forEach(option => {
-        option.classList.remove('selected');
-    });
-    
-    element.classList.add('selected');
-    selectedTopHungType = type;
-    
-    window.selectedTopHungType = type.value;
-    
-    const topHungDropdown = document.getElementById('topHungWindowType');
-    if (topHungDropdown && type.value) {
-        topHungDropdown.value = type.value;
-        const changeEvent = new Event('change');
-        topHungDropdown.dispatchEvent(changeEvent);
+    function selectTopHungType(type, element) {
+        document.querySelectorAll('#topHungTypeSelector .image-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        element.classList.add('selected');
+        selectedTopHungType = type; 
+        
+
+        window.selectedTopHungType = type.value;
+        
+        console.log(`Selected top-hung type: ${type.value} - ${type.label}`);
+        console.log(`🔄 window.selectedTopHungType set to: ${window.selectedTopHungType}`);
+        
+        const totalHeight = parseInt(document.getElementById('heightId')?.value || 0);
+        const totalWidth = parseInt(document.getElementById('widthId')?.value || 0);
+        
+        if (typeof window.validateTopHungDimensions === 'function') {
+            window.validateTopHungDimensions(
+                type.value,
+                null, null,
+                totalWidth || 0,
+                totalHeight || 0
+            );
+        }
+        
+        if (typeof window.updatePreview === 'function') {
+            window.updatePreview();
+        }
+        
+        const event = new CustomEvent('topHungChanged', { 
+            detail: { type: type.value, label: type.label }
+        });
+        document.dispatchEvent(event);
     }
-    
-    console.log(`Selected top-hung type: ${type.value} - ${type.label}`);
-    console.log(`🔄 window.selectedTopHungType set to: ${window.selectedTopHungType}`);
-    
-    const event = new CustomEvent('topHungChanged', { 
-        detail: { type: type.value, label: type.label }
-    });
-    document.dispatchEvent(event);
-    
-    if (typeof window.updatePreview === 'function') {
-        window.updatePreview();
-    }
-}
 
 function initTopHungSelection() {
     const topHungTypeSelector = document.getElementById('topHungTypeSelector');

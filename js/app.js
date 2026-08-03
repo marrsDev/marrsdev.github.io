@@ -58,9 +58,24 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCalculationObject();
     });
 
-    // Handle top-hung type selection
+    // Handle top-hung type selection 
     document.addEventListener('topHungChanged', function(e) {
         console.log('TopHungChanged event received:', e.detail);
+        
+        // Get current dimensions
+        const totalHeight = parseInt(document.getElementById('heightId')?.value || 0);
+        const totalWidth = parseInt(document.getElementById('widthId')?.value || 0);
+        
+        // Update vent fields based on selected type
+        if (typeof validateTopHungDimensions === 'function') {
+            validateTopHungDimensions(
+                e.detail.type,
+                null, null,
+                totalWidth || 0,
+                totalHeight || 0
+            );
+        }
+        
         updatePreview();
         if (typeof updateTopHungVentFields === 'function') {
             updateTopHungVentFields(e.detail.type);
@@ -761,9 +776,10 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
         let showWidthInput = false;
         let showHeightInput = false;
         
-        const ventInputsContainer = document.getElementById('topHungVentInputs');
-        const ventWidthInputContainer = document.getElementById('topHungVentWidthContainer');
-        const ventHeightInputContainer = document.getElementById('topHungVentHeightContainer');
+        // Use the new container IDs
+        const ventInputsContainer = document.getElementById('ventInputsContainer');
+        const ventWidthInputContainer = document.getElementById('ventWidthContainer');
+        const ventHeightInputContainer = document.getElementById('ventHeightContainer');
         
     switch(topHungWindowType) {
         case 'singlePanel': // TYPE 13 - Full width & height
@@ -931,28 +947,28 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
             if (!validHeight || isNaN(validHeight)) validHeight = 600;
     }
     
-    // Show/hide the entire vent inputs container if both are hidden (TYPE13)
+    // Show/hide the entire vent inputs container if both are hidden
     if (ventInputsContainer) {
         const shouldShowContainer = showWidthInput || showHeightInput;
         ventInputsContainer.style.display = shouldShowContainer ? 'block' : 'none';
+        // Also toggle the fixed-height-input-container class for styling
+        if (shouldShowContainer) {
+            ventInputsContainer.classList.add('visible');
+        } else {
+            ventInputsContainer.classList.remove('visible');
+        }
         console.log(`📦 Container visibility: ${shouldShowContainer ? 'SHOW' : 'HIDE'}`);
-    } else {
-        console.warn('⚠️ ventInputsContainer not found');
     }
     
     // Show/hide individual input containers
     if (ventWidthInputContainer) {
         ventWidthInputContainer.style.display = showWidthInput ? 'block' : 'none';
         console.log(`📏 Width input visibility: ${showWidthInput ? 'SHOW' : 'HIDE'}`);
-    } else {
-        console.warn('⚠️ ventWidthInputContainer not found');
     }
     
     if (ventHeightInputContainer) {
         ventHeightInputContainer.style.display = showHeightInput ? 'block' : 'none';
         console.log(`📏 Height input visibility: ${showHeightInput ? 'SHOW' : 'HIDE'}`);
-    } else {
-        console.warn('⚠️ ventHeightInputContainer not found');
     }
     
     // Update help text
@@ -961,24 +977,24 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
     if (widthHelp && heightHelp) {
         switch(topHungWindowType) {
             case 'singlePanel':
-                widthHelp.textContent = 'Fixed to full window width';
-                heightHelp.textContent = 'Fixed to full window height';
+                widthHelp.textContent = 'not adjustable)';
+                heightHelp.textContent = 'not adjustable)';
                 break;
             case 'doublePanel':
-                widthHelp.textContent = 'Fixed to full window width (not adjustable)';
-                heightHelp.textContent = 'User adjustable (200mm to 70% of total height)';
+                widthHelp.textContent = '(not adjustable)';
+                heightHelp.textContent = 'Leave blank for auto.';
                 break;
             case 'customLight':
-                widthHelp.textContent = 'User adjustable (300mm to 40% of total width)';
-                heightHelp.textContent = 'User adjustable (200mm to 80% of total height)';
+                widthHelp.textContent = 'Leave blank for auto.';
+                heightHelp.textContent = 'Leave blank for auto.';
                 break;
             case 'centerHung':
-                widthHelp.textContent = 'Fixed to full window width (not adjustable)';
-                heightHelp.textContent = 'User adjustable (300mm to 80% of total height)';
+                widthHelp.textContent = 'Leave blank for auto.';
+                heightHelp.textContent = 'Leave blank for auto.';
                 break;
             default:
-                widthHelp.textContent = 'User adjustable (300-1000mm)';
-                heightHelp.textContent = 'User adjustable (300mm to 80% of total height)';
+                widthHelp.textContent = 'Leave blank for auto.';
+                heightHelp.textContent = 'Leave blank for auto.';
         }
     }
     
@@ -1001,6 +1017,44 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
 
         
         return { validWidth, validHeight };
+    }
+
+    // Add event listeners for height and width changes to update vent fields
+    const heightId = document.getElementById('heightId');
+    const widthId = document.getElementById('widthId');
+
+    if (heightId) {
+        heightId.addEventListener('change', function() {
+            const totalHeight = parseInt(this.value || 0);
+            const totalWidth = parseInt(document.getElementById('widthId')?.value || 0);
+            const selectedType = window.selectedTopHungType || 'doublePanel';
+            
+            if (typeof validateTopHungDimensions === 'function') {
+                validateTopHungDimensions(
+                    selectedType,
+                    null, null,
+                    totalWidth || 0,
+                    totalHeight || 0
+                );
+            }
+        });
+    }
+
+    if (widthId) {
+        widthId.addEventListener('change', function() {
+            const totalWidth = parseInt(this.value || 0);
+            const totalHeight = parseInt(document.getElementById('heightId')?.value || 0);
+            const selectedType = window.selectedTopHungType || 'doublePanel';
+            
+            if (typeof validateTopHungDimensions === 'function') {
+                validateTopHungDimensions(
+                    selectedType,
+                    null, null,
+                    totalWidth || 0,
+                    totalHeight || 0
+                );
+            }
+        });
     }
 
     // ============================================
