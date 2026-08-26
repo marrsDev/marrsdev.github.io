@@ -214,7 +214,7 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
             }
             
             const data = await response.json();
-            // console.log('Response data:', data);
+
             
             if (data.success && data.totalCost !== undefined) {
                 return {
@@ -362,7 +362,7 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
             }
             
             const data = await response.json();
-            // console.log('Response data:', data);
+
             
             if (data.success && data.totalCost !== undefined) {
                 return {
