@@ -485,7 +485,6 @@ function initSlidingSelection() {
         
         optionDiv.innerHTML = `
             <img src="${type.imageSrc}" alt="${type.label}" width="${type.width}" height="110">
-            <span class="option-label">${type.label}</span>
         `;
         
         optionDiv.addEventListener('click', (e) => {
@@ -855,7 +854,6 @@ function initCasementSelection() {
         
         optionDiv.innerHTML = `
             <img src="${type.imageSrc}" alt="${type.label}" width="${type.width}" height="110">
-            <span class="option-label">${type.label}</span>
         `;
         
         optionDiv.addEventListener('click', (e) => {
@@ -929,7 +927,6 @@ function initTopHungSelection() {
         
         optionDiv.innerHTML = `
             <img src="${type.imageSrc}" alt="${type.label}" width="${type.width}" height="110">
-            <span class="option-label">${type.label}</span>
         `;
         
         optionDiv.addEventListener('click', (e) => {
@@ -1150,7 +1147,6 @@ function initSlidingAluDoorSelection() {
         
         optionDiv.innerHTML = `
             <img src="${type.imageSrc}" alt="${type.label}" width="${type.width}" height="110">
-            <span class="option-label">${type.label}</span>
         `;
         
         optionDiv.addEventListener('click', (e) => {
@@ -1268,6 +1264,52 @@ function initAllSelections() {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', initAllSelections);
 
+// ============================================
+// TYPE DESCRIPTORS (rendered in the preview area)
+// The selector tiles show images only, so the selected type's description is
+// shown in the preview area as a dash list instead:
+//   "2 Panels Door (No Fixed) - no insect Mesh"
+//     -> ["2 Panels Door", "No Fixed", "no insect Mesh"]
+// ============================================
+function describeTypeLabel(label) {
+    if (!label) return [];
+    
+    const parts = [];
+    String(label).split(' - ').forEach((chunk, index) => {
+        const text = chunk.trim();
+        
+        if (index === 0) {
+            // First chunk may carry a parenthetical qualifier: "Base (Qualifier)"
+            const m = text.match(/^(.*?)\s*\((.*)\)$/);
+            if (m) {
+                parts.push(m[1].trim());
+                const inner = m[2].trim();
+                const withSplit = inner.split(/\s+with\s+/i);
+                if (withSplit.length === 2) {
+                    parts.push(withSplit[0].trim(), 'with ' + withSplit[1].trim());
+                } else {
+                    parts.push(inner);
+                }
+            } else {
+                parts.push(text);
+            }
+        } else {
+            parts.push(text);
+        }
+    });
+    
+    return parts.filter(Boolean);
+}
+
+// Label of whichever type selector exists on this page
+function getSelectedTypeLabel() {
+    if (selectedSlidingAluDoorType) return selectedSlidingAluDoorType.label;
+    if (selectedSlidingType) return selectedSlidingType.label;
+    if (selectedTopHungType) return selectedTopHungType.label;
+    if (selectedCasementType) return selectedCasementType.label;
+    return null;
+}
+
 // Make functions globally accessible
 window.selectSlidingType = selectSlidingType;
 window.selectSlidingAluDoorType = selectSlidingAluDoorType;
@@ -1282,3 +1324,5 @@ window.selectAluDoorTypeByKey = selectAluDoorTypeByKey;
 window.scrollAluDoorTypeIntoView = scrollAluDoorTypeIntoView;
 window.getCurrentFixedHeight = () => currentFixedHeight;
 window.getCurrentSlidingAluDoorFixedHeight = () => currentSlidingAluDoorFixedHeight;
+window.describeTypeLabel = describeTypeLabel;
+window.getSelectedTypeLabel = getSelectedTypeLabel;

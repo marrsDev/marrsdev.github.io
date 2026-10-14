@@ -315,6 +315,14 @@ a {
     max-width: 80%;
 }
 
+/* Selected type descriptor shown under the preview image.
+   Uses the same font stack as the dropdown boxes, which inherit Consolas
+   from .left-section via `.properties-field select { font-family: inherit }`. */
+#type-code {
+    font-family: Consolas, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, sans-serif;
+    font-size: 15px;
+}
+
 /* Input and select focus styles */
 .left-section input:focus,
 .left-section select:focus {

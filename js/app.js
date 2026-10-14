@@ -1393,7 +1393,16 @@ if (doorHasFixedHeight) {
             console.log(`Preview image updated to: img/previewLabels/${imageName}.png`);
         }
         if (typeCodeElement) {
-            typeCodeElement.textContent = `#${imageName}`;
+            // Show the selected type's descriptor as a dash list. The selector tiles
+            // now carry images only, so this replaces the old "#type-32" code.
+            const typeLabel = window.getSelectedTypeLabel ? window.getSelectedTypeLabel() : null;
+            const descriptorParts = (typeLabel && window.describeTypeLabel)
+                ? window.describeTypeLabel(typeLabel)
+                : [];
+            
+            typeCodeElement.innerHTML = descriptorParts.length
+                ? descriptorParts.map(part => `- ${part}`).join('<br>')
+                : `#${imageName}`;
         }
     }
 
