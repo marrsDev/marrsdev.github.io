@@ -220,6 +220,182 @@ const slidingTypes = [
 ];
 
 // ============================================
+// SLIDING ALU DOOR TYPES (NEW)
+// ============================================
+const slidingAluDoorTypes = [
+    // 2 PANEL Sliding Door
+    {
+        id: 'type31',
+        value: '2-noPartition-aluDoor',
+        imageSrc: 'img/type-select-images/type-31.png',
+        width: '150px',
+        label: '2 Panels Door (No Fixed) - no insect Mesh',
+        hasFixedHeight: false,
+        typeKey: 'type31'
+    },
+    {
+        id: 'type32',
+        value: '2-fixedTop-aluDoor',
+        imageSrc: 'img/type-select-images/type-32.png',
+        width: '197px',
+        label: '2 Panels Door (Single Fixed) - no insect Mesh',
+        hasFixedHeight: true,
+        typeKey: 'type32'
+    },
+
+    // 3 PANEL DOOR
+    {
+        id: 'type34',
+        value: '3-noPartition-aluDoor',
+        imageSrc: 'img/type-select-images/type-34.png',
+        width: '197px',
+        label: '3 Panels Door (No Fixed) - no insect Mesh',
+        hasFixedHeight: false,
+        typeKey: 'type34'
+    },
+    {
+        id: 'type35',
+        value: '3-fixedTop-aluDoor',
+        imageSrc: 'img/type-select-images/type-35.png',
+        width: '197px',
+        label: '3 Panels Door (Single Fixed) - no insect Mesh',
+        hasFixedHeight: true,
+        typeKey: 'type35'
+    },
+
+    // 4 PANEL DOORS
+    {
+        id: 'type37',
+        value: '4-noPartition-aluDoor',
+        imageSrc: 'img/type-select-images/type-37.png',
+        width: '167px',
+        label: '4 Panels Door (No Fixed) - no insect Mesh',
+        hasFixedHeight: false,
+        typeKey: 'type37'
+    },
+    {
+        id: 'type38',
+        value: '4-fixedTop-aluDoor',
+        imageSrc: 'img/type-select-images/type-38.png',
+        width: '167px',
+        label: '4 Panels Door (Single Fixed) - no insect Mesh',
+        hasFixedHeight: true,
+        typeKey: 'type38'
+    },
+
+    // HYBRID DOORS (Sliding + Casement)
+    {
+        id: 'type41',
+        value: '2-openAbleTop-aluDoor',
+        imageSrc: 'img/type-select-images/type-41.png',
+        width: '167px',
+        label: '2 Panels Door (Hybrid) - no insect Mesh',
+        hasFixedHeight: true,
+        typeKey: 'type41'
+    },
+    {
+        id: 'type42',
+        value: '3-openAbleTop-aluDoor',
+        imageSrc: 'img/type-select-images/type-42.png',
+        width: '167px',
+        label: '3 Panels Door (Hybrid) - no insect Mesh',
+        hasFixedHeight: true,
+        typeKey: 'type42'
+    },
+    {
+        id: 'type43',
+        value: '4-openAbleTop-aluDoor',
+        imageSrc: 'img/type-select-images/type-43.png',
+        width: '167px',
+        label: '4 Panels Door (Hybrid) - no insect Mesh',
+        hasFixedHeight: true,
+        typeKey: 'type43'
+    },
+    {
+        id: 'type44',
+        value: '2-noPartition-aluDoor-withMosquitoPanel',
+        imageSrc: 'img/type-select-images/type-44.png',
+        width: '167px',
+        label: '2 Panels Door (with insect mesh)',
+        hasFixedHeight: false,
+        typeKey: 'type44'
+    },
+    {
+        id: 'type45',
+        value: '2-fixedTop-aluDoor-withMosquitoPanel',
+        imageSrc: 'img/type-select-images/type-45.png',
+        width: '167px',
+        label: '2 Panels Door (with insect mesh)',
+        hasFixedHeight: true,
+        typeKey: 'type45'
+    },
+    {
+        id: 'type46',
+        value: '3-noPartition-aluDoor-withMosquitoPanel',
+        imageSrc: 'img/type-select-images/type-46.png',
+        width: '167px',
+        label: '3 Panels Door (with insect mesh)',
+        hasFixedHeight: false,
+        typeKey: 'type46'
+    },
+    {
+        id: 'type47',
+        value: '3-fixedTop-aluDoor-withMosquitoPanel',
+        imageSrc: 'img/type-select-images/type-47.png',
+        width: '167px',
+        label: '3 Panels Door (with insect mesh)',
+        hasFixedHeight: true,
+        typeKey: 'type47'
+    },
+    {
+        id: 'type48',
+        value: '4-noPartition-aluDoor-withMosquitoPanel',
+        imageSrc: 'img/type-select-images/type-48.png',
+        width: '167px',
+        label: '4 Panels Door (with insect mesh)',
+        hasFixedHeight: false,
+        typeKey: 'type48'
+    },
+    {
+        id: 'type49',
+        value: '4-fixedTop-aluDoor-withMosquitoPanel',
+        imageSrc: 'img/type-select-images/type-49.png',
+        width: '167px',
+        label: '4 Panels Door (with insect mesh)',
+        hasFixedHeight: true,
+        typeKey: 'type49'
+    },
+    {
+        id: 'type50',
+        value: '2-openAbleTop-aluDoor-withMosquitoPanel',
+        imageSrc: 'img/type-select-images/type-50.png',
+        width: '167px',
+        label: '2 Panels Door (Hybrid with insect mesh)',
+        hasFixedHeight: true,
+        typeKey: 'type50'
+    },
+    {
+        id: 'type51',
+        value: '3-openAbleTop-aluDoor-withMosquitoPanel',
+        imageSrc: 'img/type-select-images/type-51.png',
+        width: '167px',
+        label: '3 Panels Door (Hybrid with insect mesh)',
+        hasFixedHeight: true,
+        typeKey: 'type51'
+    },
+        {
+        id: 'type52',
+        value: '4-openAbleTop-aluDoor-withMosquitoPanel',
+        imageSrc: 'img/type-select-images/type-52.png',
+        width: '167px',
+        label: '4 Panels Door (Hybrid with insect mesh)',
+        hasFixedHeight: true,
+        typeKey: 'type52'
+    },
+
+];
+
+// ============================================
 // SLIDING SELECTION
 // ============================================
 let selectedSlidingType = null;
@@ -282,6 +458,14 @@ function selectSlidingType(type, element) {
     // Also trigger the global updatePreview if available
     if (typeof window.updatePreview === 'function') {
         window.updatePreview();
+    }
+    
+    // Refresh the fixed-partition guidance immediately - same reasoning as the
+    // alu-door selector: the divs must not depend on a height input event.
+    const heightInput = document.getElementById('heightId');
+    const totalHeight = heightInput ? parseInt(heightInput.value) : NaN;
+    if (!isNaN(totalHeight) && totalHeight > 0) {
+        validateFixedHeight(totalHeight);
     }
 }
 
@@ -556,6 +740,76 @@ function validateFixedHeight(totalHeight) {
 }
 
 // ============================================
+// ALU DOOR FIXED HEIGHT VALIDATION (UI Help Text Only)
+// Sliding aluminium doors are SINGLE fixed only - never double fixed.
+// Rule: the openable (sliding) section must be at least 1800mm tall.
+// Default fixed partition is 500mm, i.e. default openable = totalHeight - 500.
+// ============================================
+const ALU_DOOR_MIN_OPENABLE_HEIGHT = 1800;
+const ALU_DOOR_DEFAULT_FIXED_HEIGHT = 500;
+
+function validateAluDoorFixedHeight(totalHeight) {
+    const fixedHeightInput = document.getElementById('fixedHeightInput');
+    const warningsDiv = document.getElementById('fixed-height-warnings');
+    const infoDiv = document.getElementById('fixed-height-info');
+    
+    if (!fixedHeightInput || !warningsDiv || !infoDiv) return null;
+    if (!selectedSlidingAluDoorType || !selectedSlidingAluDoorType.hasFixedHeight) return null;
+    
+    const rawValue = fixedHeightInput.value.trim();
+    
+    // Clear previous messages
+    warningsDiv.innerHTML = '';
+    infoDiv.innerHTML = '';
+    
+    // Largest fixed partition this height can carry and still leave 1800mm openable
+    const maxFixedHeight = totalHeight - ALU_DOOR_MIN_OPENABLE_HEIGHT;
+    
+    // No user value: the 500mm default applies, i.e. openable = totalHeight - 500
+    if (rawValue === '') {
+        const openableHeight = totalHeight - ALU_DOOR_DEFAULT_FIXED_HEIGHT;
+        currentSlidingAluDoorFixedHeight = ALU_DOOR_DEFAULT_FIXED_HEIGHT;
+        
+        if (openableHeight < ALU_DOOR_MIN_OPENABLE_HEIGHT) {
+            warningsDiv.innerHTML = `⚠️ The default ${ALU_DOOR_DEFAULT_FIXED_HEIGHT}mm fixed partition leaves only ${openableHeight}mm openable, below the ${ALU_DOOR_MIN_OPENABLE_HEIGHT}mm minimum for a door. Increase the height, or choose a door type without a fixed partition.`;
+        } else {
+            infoDiv.innerHTML = `ℹ️ Using default fixed height: ${ALU_DOOR_DEFAULT_FIXED_HEIGHT}mm. Openable section: ${openableHeight}mm (minimum ${ALU_DOOR_MIN_OPENABLE_HEIGHT}mm)`;
+        }
+        return ALU_DOOR_DEFAULT_FIXED_HEIGHT;
+    }
+    
+    const fixedHeight = parseInt(rawValue);
+    
+    if (isNaN(fixedHeight) || fixedHeight <= 0) {
+        warningsDiv.innerHTML = '⚠️ Please enter a valid positive number for fixed height';
+        return null;
+    }
+    
+    const openableHeight = totalHeight - fixedHeight;
+    
+    // A user-supplied fixed height must leave at least 1800mm of openable door
+    if (openableHeight < ALU_DOOR_MIN_OPENABLE_HEIGHT) {
+        const remedy = maxFixedHeight > 0
+            ? `Choose a door type without a fixed partition, or reduce the fixed height to ${maxFixedHeight}mm or less.`
+            : `Choose a door type without a fixed partition - at ${totalHeight}mm height there is no room for one.`;
+        
+        warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm is too large: it leaves only ${openableHeight}mm openable, below the ${ALU_DOOR_MIN_OPENABLE_HEIGHT}mm minimum for a door. ${remedy}`;
+        currentSlidingAluDoorFixedHeight = fixedHeight;
+        return null;
+    }
+    
+    if (fixedHeight < 200) {
+        warningsDiv.innerHTML = '⚠️ Fixed height should be at least 200mm for structural integrity';
+        currentSlidingAluDoorFixedHeight = fixedHeight;
+        return null;
+    }
+    
+    infoDiv.innerHTML = `✅ Using fixed height: ${fixedHeight}mm. Openable section: ${openableHeight}mm (minimum ${ALU_DOOR_MIN_OPENABLE_HEIGHT}mm)`;
+    currentSlidingAluDoorFixedHeight = fixedHeight;
+    return fixedHeight;
+}
+
+// ============================================
 // CASEMENT SELECTION
 // ============================================
 let selectedCasementType = null;
@@ -727,6 +981,208 @@ function syncDropdownWithImageSelection() {
 }
 
 // ============================================
+// Alu SLIDING DOOR SELECTION
+// ============================================
+let selectedSlidingAluDoorType = null;
+let selectedSlidingAluDoorTypeKey = null;
+let currentSlidingAluDoorFixedHeight = null;
+
+function selectSlidingAluDoorType(type, element) {
+    // Remove selected class from all options
+    document.querySelectorAll('#slidingAluDoorTypeSelector .image-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked option
+    element.classList.add('selected');
+    
+    // Update the selected type
+    selectedSlidingAluDoorType = type;
+    selectedSlidingAluDoorTypeKey = type.typeKey;
+
+    // CRITICAL FIX: Update the global window property so app.js can read it
+    window.selectedSlidingAluDoorTypeKey = type.typeKey;
+    window.currentSlidingAluDoorTypeKey = type.typeKey;
+    
+    console.log(`Selected sliding type: ${type.value} - ${type.label} (key: ${type.typeKey})`);
+
+    console.log(`🔄 window.selectedSlidingAluDoorTypeKey set to: ${window.selectedSlidingAluDoorTypeKey}`);
+
+    
+    // Show/hide fixed height input
+    const fixedHeightContainer = document.getElementById('fixedHeightContainer');
+    if (fixedHeightContainer) {
+        if (type.hasFixedHeight) {
+            fixedHeightContainer.classList.add('visible');
+        } else {
+            fixedHeightContainer.classList.remove('visible');
+            // Clear any warnings/info
+            document.getElementById('fixed-height-info').innerHTML = '';
+            document.getElementById('fixed-height-warnings').innerHTML = '';
+        }
+    }
+    
+    // Reset fixed height when type changes
+    const fixedHeightInput = document.getElementById('fixedHeightInput');
+    if (fixedHeightInput) {
+        fixedHeightInput.value = '';
+        currentSlidingAluDoorFixedHeight = null;
+    }
+    
+    // Trigger a custom event that app.js can listen to
+    // NOTE: app.js listens for 'slidingAluDoorChanged' (not 'slidingChanged')
+    const event = new CustomEvent('slidingAluDoorChanged', { 
+        detail: { 
+            type: type.value, 
+            label: type.label,
+            typeKey: type.typeKey,
+            hasFixedHeight: type.hasFixedHeight
+        }
+    });
+    document.dispatchEvent(event);
+    
+    // Also trigger the global updatePreview if available
+    if (typeof window.updatePreview === 'function') {
+        window.updatePreview();
+    }
+    
+    // Refresh the fixed-partition guidance immediately. Without this the info and
+    // warning divs only update on a height/fixed-height input event, so a user who
+    // just clicks a different type image never sees the current guidance.
+    const heightInput = document.getElementById('heightId');
+    const totalHeight = heightInput ? parseInt(heightInput.value) : NaN;
+    if (!isNaN(totalHeight) && totalHeight > 0) {
+        validateAluDoorFixedHeight(totalHeight);
+    }
+}
+
+// ============================================
+// ALU DOOR: no-fixed fallback types
+// When the default 500mm fixed partition leaves less than 1800mm openable the
+// calculation is denied and the equivalent door WITHOUT a fixed partition is
+// selected instead. Panel count and insect mesh are preserved; only the fixed
+// (awning) top is dropped. The hybrid types have no hybrid equivalent, so they
+// fall back to the plain sliding door of the same panel count.
+// ============================================
+const ALU_DOOR_NO_FIXED_FALLBACK = {
+    type32: 'type31', // 2 panel, two track
+    type35: 'type34', // 3 panel, tripple track
+    type38: 'type37', // 4 panel, two track
+    type41: 'type31', // 2 panel hybrid      -> plain 2 panel
+    type42: 'type34', // 3 panel hybrid      -> plain 3 panel
+    type43: 'type37', // 4 panel hybrid      -> plain 4 panel
+    type45: 'type44', // 2 panel + mesh
+    type47: 'type46', // 3 panel + mesh
+    type49: 'type48', // 4 panel + mesh
+    type50: 'type44', // 2 panel hybrid+mesh -> 2 panel + mesh
+    type51: 'type46', // 3 panel hybrid+mesh -> 3 panel + mesh
+    type52: 'type48'  // 4 panel hybrid+mesh -> 4 panel + mesh
+};
+
+function getAluDoorNoFixedFallback(typeKey) {
+    return ALU_DOOR_NO_FIXED_FALLBACK[typeKey] || null;
+}
+
+// Bring an option into the centre of the selector strip. Uses rect maths rather
+// than scrollIntoView so the page's vertical scroll position is never disturbed.
+function scrollAluDoorTypeIntoView(option) {
+    const selector = document.getElementById('slidingAluDoorTypeSelector');
+    if (!selector || !option) return;
+    if (typeof selector.getBoundingClientRect !== 'function' ||
+        typeof option.getBoundingClientRect !== 'function') return;
+    
+    const maxScroll = selector.scrollWidth - selector.clientWidth;
+    if (maxScroll <= 0) return;   // the strip fits, nothing to scroll
+    
+    const selectorRect = selector.getBoundingClientRect();
+    const optionRect = option.getBoundingClientRect();
+    const target = selector.scrollLeft + (optionRect.left - selectorRect.left)
+                 - (selector.clientWidth - optionRect.width) / 2;
+    const left = Math.max(0, Math.min(target, maxScroll));
+    
+    // Stop the one-off discoverability nudge from scrolling the strip straight
+    // back away from the newly selected type.
+    try { sessionStorage.setItem('nudge_slidingAluDoorTypeSelector', 'true'); } catch (err) {}
+    
+    if (typeof selector.scrollTo === 'function') {
+        selector.scrollTo({ left: left, behavior: 'smooth' });
+    } else {
+        selector.scrollLeft = left;
+    }
+}
+
+// Programmatically select a door type by its typeKey, driving the same code path
+// as a user click (selected class, globals, fixed-height container, preview).
+// Also scrolls the strip to the new selection - after an automatic fallback the
+// substitute can be far from wherever the user was looking.
+function selectAluDoorTypeByKey(typeKey) {
+    const selector = document.getElementById('slidingAluDoorTypeSelector');
+    if (!selector || !typeKey) return null;
+    
+    const type = slidingAluDoorTypes.find(t => t.typeKey === typeKey);
+    if (!type) return null;
+    
+    const optionDiv = selector.querySelector(`.image-option[data-type-key="${typeKey}"]`);
+    if (!optionDiv) return null;
+    
+    // selectSlidingAluDoorType refreshes the fixed-partition guidance itself,
+    // so no explicit clear happens here - clearing would wipe the fresh text.
+    selectSlidingAluDoorType(type, optionDiv);
+    
+    scrollAluDoorTypeIntoView(optionDiv);
+    
+    return type;
+}
+
+function initSlidingAluDoorSelection() {
+    const slidingAluDoorTypeSelector = document.getElementById('slidingAluDoorTypeSelector');
+    if (!slidingAluDoorTypeSelector) return;
+    
+    slidingAluDoorTypeSelector.innerHTML = '';
+    
+    slidingAluDoorTypes.forEach(type => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'image-option';
+        optionDiv.dataset.type = type.value;
+        optionDiv.dataset.id = type.id;
+        optionDiv.dataset.typeKey = type.typeKey;
+        optionDiv.dataset.hasFixedHeight = type.hasFixedHeight;
+        
+        optionDiv.innerHTML = `
+            <img src="${type.imageSrc}" alt="${type.label}" width="${type.width}" height="110">
+            <span class="option-label">${type.label}</span>
+        `;
+        
+        optionDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectSlidingAluDoorType(type, optionDiv);
+        });
+        
+        slidingAluDoorTypeSelector.appendChild(optionDiv);
+    });
+    
+    // Select the first option by default
+    if (slidingAluDoorTypes.length > 0) {
+        const firstOption = slidingAluDoorTypeSelector.querySelector('.image-option');
+        if (firstOption) {
+            // Check if there's a preselected value from localStorage or URL
+            const preselectedAluDoorType = localStorage.getItem('selectedSlidingAluDoorType');
+            if (preselectedAluDoorType) {
+                const matchedOption = slidingAluDoorTypeSelector.querySelector(`.image-option[data-type="${preselectedAluDoorType}"]`);
+                if (matchedOption) {
+                    const matchedType = slidingAluDoorTypes.find(t => t.value === preselectedAluDoorType);
+                    if (matchedType) {
+                        selectSlidingAluDoorType(matchedType, matchedOption);
+                        return;
+                    }
+                }
+            }
+            selectSlidingAluDoorType(slidingAluDoorTypes[0], firstOption);
+        }
+    }
+}
+
+// ============================================
 // INITIALIZATION (UPDATED)
 // ============================================
 function initAllSelections() {
@@ -775,6 +1231,38 @@ function initAllSelections() {
         // Nudge after a short delay for sliding - cookie aware
         setTimeout(() => nudgeScrollableSelector('slidingTypeSelector', 800), 1200);
     }
+
+    if (document.getElementById('slidingAluDoorTypeSelector')) {
+        initSlidingAluDoorSelection();
+        
+        // Set up fixed height validation on input change
+        const fixedHeightInput = document.getElementById('fixedHeightInput');
+        if (fixedHeightInput) {
+            fixedHeightInput.addEventListener('input', function() {
+                const heightInput = document.getElementById('heightId');
+                if (heightInput && heightInput.value) {
+                    const totalHeight = parseInt(heightInput.value);
+                    if (!isNaN(totalHeight) && totalHeight > 0) {
+                        validateAluDoorFixedHeight(totalHeight);
+                    }
+                }
+            });
+        }
+        
+        // Also validate when height changes
+        const heightInput = document.getElementById('heightId');
+        if (heightInput) {
+            heightInput.addEventListener('change', function() {
+                const totalHeight = parseInt(this.value);
+                if (!isNaN(totalHeight) && totalHeight > 0 && selectedSlidingAluDoorType && selectedSlidingAluDoorType.hasFixedHeight) {
+                    validateAluDoorFixedHeight(totalHeight);
+                }
+            });
+        }
+        
+        // Nudge after a short delay for sliding doors - cookie aware
+        setTimeout(() => nudgeScrollableSelector('slidingAluDoorTypeSelector', 800), 1200);
+    }
 }
 
 // Initialize when DOM is loaded
@@ -782,7 +1270,15 @@ document.addEventListener('DOMContentLoaded', initAllSelections);
 
 // Make functions globally accessible
 window.selectSlidingType = selectSlidingType;
+window.selectSlidingAluDoorType = selectSlidingAluDoorType;
 window.validateFixedHeight = validateFixedHeight;
+window.validateAluDoorFixedHeight = validateAluDoorFixedHeight;
 window.getSelectedSlidingType = () => selectedSlidingType;
 window.getSelectedSlidingTypeKey = () => selectedSlidingTypeKey;
+window.getSelectedSlidingAluDoorType = () => selectedSlidingAluDoorType;
+window.getSelectedSlidingAluDoorTypeKey  = () => selectedSlidingAluDoorTypeKey ;
+window.getAluDoorNoFixedFallback = getAluDoorNoFixedFallback;
+window.selectAluDoorTypeByKey = selectAluDoorTypeByKey;
+window.scrollAluDoorTypeIntoView = scrollAluDoorTypeIntoView;
 window.getCurrentFixedHeight = () => currentFixedHeight;
+window.getCurrentSlidingAluDoorFixedHeight = () => currentSlidingAluDoorFixedHeight;

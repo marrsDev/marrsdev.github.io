@@ -38,13 +38,33 @@ class CartManager {
       type21: { label: '3 Panel Folding Window', category: 'folding' },
 
       // Casement Windows
-      'c-type1': { label: 'Single Casement Window', category: 'casement' },
+      'c-type1': { label: 'Dbl Top-hung Casement Window', category: 'casement' },
       'c-type2': { label: 'Double Casement Window', category: 'casement' },
-      'c-type3': { label: 'Casement with Fixed Top Light', category: 'casement' },
-      'c-type4': { label: 'Casement with Transom & Side Lights', category: 'casement' },
-      'c-type5': { label: 'Fixed Window', category: 'casement' },
-      'c-type6': { label: '4-Panel Casement Window', category: 'casement' },
-      'c-type7': { label: 'Top-Hung Casement Window', category: 'casement' }
+      'c-type3': { label: 'Single Center-hung Casement Wndw', category: 'casement' },
+      'c-type4': { label: 'Single Top-hung Casement Window', category: 'casement' },
+      'c-type5': { label: 'Dbl Top-hung Casement Window', category: 'casement' },
+      'c-type6': { label: 'Single Top-hung Casement Window', category: 'casement' },
+      'c-type7': { label: 'Single Top-Hung Casement Window', category: 'casement' },
+
+      // Sliding Aluminium Doors
+      type31: { label: '2 Panel Sliding Door', category: 'slidingAluDoor' },
+      type32: { label: '2 Panel Sliding Door', category: 'slidingAluDoor' },
+      type34: { label: '3 Panel Sliding Door', category: 'slidingAluDoor' },
+      type35: { label: '3 Panel Sliding Door', category: 'slidingAluDoor' },
+      type37: { label: '4 Panel Sliding Door', category: 'slidingAluDoor' },
+      type38: { label: '4 Panel Sliding Door', category: 'slidingAluDoor' },
+      type41: { label: '2 Panel Sliding Door with Openable Top', category: 'sliding-hybridAluDoor' },
+      type42: { label: '3 Panel Sliding Door with Openable Top', category: 'sliding-hybridAluDoor' },
+      type43: { label: '4 Panel Sliding Door with Openable Top', category: 'sliding-hybridAluDoor' },
+      type44: { label: '2 Panel Sliding Door + Insect mesh', category: 'slidingAluDoor' },
+      type45: { label: '2 Panel Sliding Door, fixed top + Insect mesh', category: 'slidingAluDoor' },
+      type46: { label: '3 Panel Sliding Door + Insect mesh', category: 'slidingAluDoor' },
+      type47: { label: '3 Panel Sliding Door, fixed top + Insect mesh', category: 'slidingAluDoor' },
+      type48: { label: '4 Panel Sliding Door + Insect mesh', category: 'slidingAluDoor' },
+      type49: { label: '4 Panel Sliding Door, fixed top + Insect mesh', category: 'slidingAluDoor' },
+      type50: { label: '2 Panel Sliding Door, awning top + Insect mesh', category: 'sliding-hybridAluDoor' },
+      type51: { label: '3 Panel Sliding Door, awning top + Insect mesh', category: 'sliding-hybridAluDoor' },
+      type52: { label: '4 Panel Sliding Door, awning top + Insect mesh', category: 'sliding-hybridAluDoor' },
     };
 
     // First check if we have a cart in URL
@@ -424,7 +444,8 @@ class CartManager {
       'sliding-hybrid': 'Sliding Windows with Openable Top',
       'folding': 'Folding Windows',
       'casement': 'Casement Windows',
-      'doors': 'Aluminium Doors',
+      'slidingAluDoor': 'Sliding Aluminium Doors',
+      'sliding-hybridAluDoor': 'Sliding Doors with Openable Top',
       'facades': 'Curtain Walling Facades',
       'partitions': 'Office Partitions',
       'other': 'Other Items'
@@ -441,7 +462,8 @@ class CartManager {
       'sliding-hybrid': '/img/labels/hybrid/',
       'folding': '/img/labels/folding/',
       'casement': '/img/labels/casement/',
-      'doors': '/img/labels/doors/',
+      'slidingAluDoor': '/img/labels/doors/',
+      'sliding-hybridAluDoor': '/img/labels/doors/',
       'facades': '/img/labels/facades/',
       'partitions': '/img/labels/partitions/'
     };

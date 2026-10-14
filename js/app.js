@@ -9,6 +9,12 @@ if (IS_DEV) {
 // Initialize Heroku Backend URL at module level
 const HEROKU_BACKEND_URL = window.HEROKU_BACKEND_URL || 'http://localhost:3000';
 
+// Sliding aluminium doors: a door with a fixed partition must keep at least this
+// much openable height. The default fixed partition is 500mm, so the default
+// openable height is (fullHeight - 500).
+const ALU_DOOR_MIN_OPENABLE_HEIGHT = 1800;
+const ALU_DOOR_DEFAULT_FIXED_HEIGHT = 500;
+
 document.addEventListener('DOMContentLoaded', function() {
     if (IS_DEV) {
         console.log('DOM fully loaded');
@@ -82,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle sliding type selection (NEW)
+    // Handle sliding type selection
     document.addEventListener('slidingChanged', function(e) {
         console.log('SlidingChanged event received:', e.detail);
         updatePreview();
@@ -108,6 +114,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Handle sliding aluminium doors type selection
+    document.addEventListener('slidingAluDoorChanged', function(e) {
+        console.log('SlidingAluDoorChanged event received:', e.detail);
+        updatePreview();
+        // Update hidden fields or state
+        if (window.selectedSlidingAluDoorTypeKey) {
+            // Store the selected type key for calculation
+            window.currentSlidingAluDoorTypeKey = e.detail.typeKey;
+        }
+        // Trigger any dependent updates
+        updateSlidingAluDoorConfiguration(e.detail);
+    });
+
+    // Function to update sliding aludoor configuration when type changes
+    function updateSlidingAluDoorConfiguration(detail) {
+        // Update any UI elements that depend on the sliding type
+        const fixedHeightContainer = document.getElementById('fixedHeightContainer');
+        if (fixedHeightContainer) {
+            if (detail.hasFixedHeight) {
+                fixedHeightContainer.classList.add('visible');
+            } else {
+                fixedHeightContainer.classList.remove('visible');
+            }
+        }
+    }
 
     // Initialize preview based on page type
     updatePreview();
@@ -229,6 +260,154 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
         } catch (error) {
             console.error('Error calculating sliding cost:', error);
             alert('Error calculating cost. Please try again.');
+            if (error.message.includes('Failed to fetch')) {
+                alert('Calculator engine is waking up. Please give it a few seconds.');
+            }
+            return null;
+        }
+    }
+
+    // ============================================
+    // SLIDING DOOR CALCULATION (UPDATED)
+    // ============================================
+    async function calculateSlidingAluDoorCost() {
+        // Get values for sliding doors
+        const height = parseInt(document.getElementById('heightId')?.value || 0);
+        const width = parseInt(document.getElementById('widthId')?.value || 0);
+        const profileColour = document.getElementById('profileColour')?.value || 'white';
+        const glassType = document.getElementById('glassType')?.value || 'clear';
+        const glassThickness = document.getElementById('glassThickness')?.value || '4mm';
+        
+        let selectedTypeKey = window.selectedSlidingAluDoorTypeKey || null;
+        
+        // Log the current selection for debugging
+        console.log(`🔑 Selected type key from sliding alu door: ${selectedTypeKey}`);
+        
+        // If no type selected yet, default to type31
+        if (!selectedTypeKey) {
+            console.log('⚠️ No sliding alu door type selected, defaulting to type31');
+            selectedTypeKey = 'type31';
+        }
+        
+        // Sliding doors are single-fixed or no-fixed only - never double fixed.
+        // Derive "needs a fixed height" from the selector metadata rather than a
+        // hardcoded list, so the two cannot drift apart.
+        const selectedDoorType = window.getSelectedSlidingAluDoorType ? window.getSelectedSlidingAluDoorType() : null;
+        const doorHasFixedHeight = !!(selectedDoorType && selectedDoorType.hasFixedHeight);
+        
+        // Get fixed height if applicable. Track whether the user actually typed a
+        // value: the 1800mm minimum is a hard constraint on user input, whereas the
+        // 500mm default is always allowed through (it warns instead of blocking).
+        let fixedHeight = null;
+        let userSuppliedFixedHeight = false;
+        const fixedHeightInput = document.getElementById('fixedHeightInput');
+        if (fixedHeightInput && fixedHeightInput.value.trim() !== '') {
+            const parsedFixedHeight = parseInt(fixedHeightInput.value);
+            if (!isNaN(parsedFixedHeight)) {
+                fixedHeight = parsedFixedHeight;
+                userSuppliedFixedHeight = true;
+            }
+        }
+        
+        if (!doorHasFixedHeight) {
+            // A no-fixed door type must not carry a stale value from the hidden input
+            fixedHeight = null;
+            userSuppliedFixedHeight = false;
+        } else if (!userSuppliedFixedHeight) {
+            // Default: leave a 500mm fixed partition, so openable = height - 500
+            fixedHeight = ALU_DOOR_DEFAULT_FIXED_HEIGHT;
+        }
+        
+        // Validate inputs
+        if (!height || !width || height <= 0 || width <= 0) {
+            alert('Please enter valid height and width values');
+            return null;
+        }
+        
+// A door with a fixed partition must leave at least 1800mm of openable height.
+// `fixedHeight` is already either the user's value or ALU_DOOR_DEFAULT_FIXED_HEIGHT
+// at this point, so this single check covers both the user-supplied and the default
+// case. The calculation is denied and the equivalent no-fixed door type is selected
+// for the user, who can accept it or switch back and enter a smaller fixed height.
+if (doorHasFixedHeight) {
+    const openableHeight = height - fixedHeight;
+    
+    if (openableHeight < ALU_DOOR_MIN_OPENABLE_HEIGHT) {
+        const fallbackKey = window.getAluDoorNoFixedFallback
+            ? window.getAluDoorNoFixedFallback(selectedTypeKey)
+            : null;
+        const fallbackType = (fallbackKey && window.selectAluDoorTypeByKey)
+            ? window.selectAluDoorTypeByKey(fallbackKey)
+            : null;
+        
+        if (fallbackType) {
+            // The substitute is selected before the dialog opens, so the type
+            // selector already shows it once the dialog is dismissed.
+            alert(`⚠️ Openable door will be very short. A type without a fixed partition has been selected for you, just press the calculate button, OR, change back to your desired design and set a smaller fixed height`);
+        } else {
+            // Unreachable while every fixed-partition type has a fallback mapping,
+            // but kept so a missing mapping degrades to a clear message.
+            const maxFixedHeight = height - ALU_DOOR_MIN_OPENABLE_HEIGHT;
+            const remedy = maxFixedHeight > 0
+                ? `Choose a door type without a fixed partition, or reduce the fixed height to ${maxFixedHeight}mm or less.`
+                : `Choose a door type without a fixed partition - at ${height}mm height there is no room for one.`;
+            alert(`⚠️ ${userSuppliedFixedHeight ? `Fixed height of ${fixedHeight}mm` : `The default ${fixedHeight}mm fixed partition`} leaves only ${openableHeight}mm openable, below the ${ALU_DOOR_MIN_OPENABLE_HEIGHT}mm minimum for a door. ${remedy}`);
+        }
+        return null;
+    }
+}
+        
+        console.log('Calculating sliding door cost:', {
+            height, width, profileColour, selectedTypeKey, fixedHeight, glassType, glassThickness
+        });
+        
+        try {
+            const requestData = {
+                height,
+                width,
+                // Doors resolve through their own key; the bridge treats an unknown
+                // door key as an error instead of falling back to a window type
+                slidingAluDoorTypeKey: selectedTypeKey,
+                // Send null when the user did not type a value, so the backend can
+                // tell "user asked for X" (validated against the 1800mm minimum)
+                // from "use the 500mm default" (allowed, warned about in the UI).
+                // The backend resolves null to 500, so the price is unchanged.
+                fixedHeight: userSuppliedFixedHeight ? fixedHeight : null,
+                glassType,
+                glassThickness,
+                profileColour
+            };
+            
+            const response = await fetch(`${HEROKU_BACKEND_URL}/api/calculations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+            
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.status}`);
+            }
+            
+            const data = await response.json();
+
+            
+            if (data.success && data.totalCost !== undefined) {
+                return {
+                    cost: data.totalCost,
+                    breakdown: data.breakdown,
+                    requestData
+                };
+            } else {
+                throw new Error('Invalid response format from server');
+            }
+            
+        } catch (error) {
+            console.error('Error calculating sliding door cost:', error);
+            alert('Error calculating sliding door cost. Please try again.');
             if (error.message.includes('Failed to fetch')) {
                 alert('Calculator engine is waking up. Please give it a few seconds.');
             }
@@ -501,6 +680,9 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
                 break;
             case 'casement':
                 result = await calculateCasementCost();
+                break;
+            case 'slidingAluDoors':
+                result = await calculateSlidingAluDoorCost();
                 break;
             case 'sliding':
             default:
@@ -1115,7 +1297,7 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
             } else {
                 imageName = 'type-70';
             }
-        } else {
+        } else if (currentPage === 'sliding') {
             // Handle sliding windows - FIRST try the image selector (new method)
             const selectedTypeKey = window.selectedSlidingTypeKey || null;
             console.log(`🔄 updatePreview: selectedTypeKey from window: ${selectedTypeKey}`);
@@ -1165,6 +1347,41 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
                     else if (fixedPartition === 'openAbleTopFxBtm') imageName = 'type-69';
                     else if (fixedPartition === 'openAbleTop') imageName = 'type-69';
                 }
+            }
+        } else {
+            // Handle sliding aluminium doors
+            const selectedTypeKey = window.selectedSlidingAluDoorTypeKey || null;
+            console.log(`🔄 updatePreview: selectedTypeKey from window: ${selectedTypeKey}`);
+            
+            // Map typeKey to preview image name (NEW method)
+            const slidingAluDoorPreviewMap = {
+                'type31': 'type-31', // 2 sliding panels AluDoor w/o fx (two track)
+                'type32': 'type-32', // 2 sliding panels AluDoor single fx (two track)
+                'type34': 'type-34', // 3 sliding panels tripple track AluDoor w/o fixed partition
+                'type35': 'type-35', // 3 sliding panels tripple track AluDoor single fixed
+                'type37': 'type-37', // 4 sliding panels AluDoor w/o fixed (two track)
+                'type38': 'type-38', // 4 sliding panels AluDoor single fixed (two track)
+                'type41': 'type-41', // 2 sliding panels AluDoor with awning top (two track)
+                'type42': 'type-42', // 3 sliding panels AluDoor, awning tops with 500m heights. (Tripple track - no mosquito panel)
+                'type43': 'type-43',  // 4 sliding panels AluDoor, awning top with 500m heights. (Two track - no mosquito panel)
+                'type44': 'type-44', // 2 sliding panels AluDoor + mosquito panel & w/o fx (tripple track)
+                'type45': 'type-45', // 2 sliding panels AluDoor + mosquito panel & single fx (tripple track)
+                'type46': 'type-46', // 3 sliding panels AluDoor + magnetic mosquito mesh & w/o fx (Tripple track)
+                'type47': 'type-47', // 3 sliding panels AluDoor single fx 500mm (Tripple track with magnetic mosquito  mesh)
+                'type48': 'type-48', // 4 sliding panels + mosquito panel AluDoor w/o fixed (tripple track)
+                'type49': 'type-49', // 4 sliding panels + mosquito panel AluDoor single fx 500mm (tripple track)
+                'type50': 'type-50', // 2 sliding panels AluDoor awning top with 500m heights + mosquito panel (Tripple track)
+                'type51': 'type-51', // 3 sliding panels AluDoor awning tops + magnetic mosquito mesh and 500m heights. (Tripple track)
+                'type52': 'type-52',  // 4 sliding panels AluDoor awning top with 500m heights + mosquito mesh panel. (Tripple track)
+            };
+            
+            // If we have a valid selectedTypeKey from the image selector, use it
+            // NOTE: must test the alu-door map. `slidingPreviewMap` belongs to the
+            // sliding-window branch above and is NOT in scope here - referencing it
+            // threw a ReferenceError that aborted updatePreview on every door page.
+            if (selectedTypeKey && slidingAluDoorPreviewMap[selectedTypeKey]) {
+                imageName = slidingAluDoorPreviewMap[selectedTypeKey];
+                console.log(`🔄 updatePreview: Using image selector mapping: ${selectedTypeKey} -> ${imageName}`);
             }
         }
         
@@ -1247,7 +1464,7 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
         const pageMap = {
             'top-hung-windows.html': 'topHung',
             'aluminium-sliding-windows.html': 'sliding',
-            'aluminium-doors.html': 'doors',
+            'aluminium-sliding-doors.html': 'slidingAluDoors',
             'curtain-walling-facades.html': 'facades',
             'office-partitions.html': 'partitions',
             'glass-types.html': 'glass',
