@@ -1259,8 +1259,8 @@ if (doorHasFixedHeight) {
             
             // Map selected type to image name
             const topHungPreviewMap = {
-                'singlePanel': 'type-12',
-                'doublePanel': 'type-13',
+                'singlePanel': 'type-13',
+                'doublePanel': 'type-14',
                 'customLight': 'type-15',
                 'centerHung': 'type-16',
                 'fixedLight': 'type-69',
