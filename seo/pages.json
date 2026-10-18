@@ -1,5 +1,5 @@
 {
-  "_comment": "Single source of truth for per-page SEO metadata. Edit this file, then run `node seo/build-seo.js` (from cb-app.public) to regenerate the <head> block, the visually-hidden <h1>, sitemap.xml and robots.txt. `node seo/check-seo.js` validates it and fails CI on problems.",
+  "_comment": "Single source of truth for per-page SEO metadata. Edit this file, then run `node seo/build-seo.js` (from cb-app.public) to regenerate the <head> block, the visually-hidden <h1>, sitemap.xml and robots.txt. `node seo/check-seo.js` validates it and fails CI on problems. Set \"inSitemap\": false on a page to keep it out of sitemap.xml while it is still being finished (its head tags are still generated, and re-running the build will not put it back).",
   "site": {
     "origin": "https://capitalbuilders.co.ke",
     "name": "Capital Builders",

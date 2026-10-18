@@ -164,9 +164,17 @@ if (!fs.existsSync(sitemapFile)) {
   fail('sitemap.xml is missing (run: node seo/build-seo.js)');
 } else {
   const sm = fs.readFileSync(sitemapFile, 'utf8');
-  for (const p of DATA.pages) {
+  // Only pages that are meant to be advertised must be present. Pages marked
+  // "inSitemap": false are being finished and are deliberately omitted.
+  for (const p of DATA.pages.filter((x) => x.inSitemap !== false)) {
     const loc = SITE.origin + p.path;
     if (!sm.includes(`<loc>${loc}</loc>`)) fail(`sitemap.xml is missing ${loc}`);
+  }
+  for (const p of DATA.pages.filter((x) => x.inSitemap === false)) {
+    const loc = SITE.origin + p.path;
+    if (sm.includes(`<loc>${loc}</loc>`)) {
+      warn(`${p.file}: has "inSitemap": false but is still listed in sitemap.xml`);
+    }
   }
   const locs = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
   const known = new Set(DATA.pages.map((p) => SITE.origin + p.path));
@@ -177,6 +185,26 @@ if (!fs.existsSync(path.join(ROOT, 'robots.txt'))) {
   fail('robots.txt is missing (run: node seo/build-seo.js)');
 } else if (!/Sitemap:\s*\S+/i.test(fs.readFileSync(path.join(ROOT, 'robots.txt'), 'utf8'))) {
   fail('robots.txt has no Sitemap: line');
+}
+
+// ---------- local asset references (warning only) ----------
+// Catches references to scripts/stylesheets that were renamed or deleted, which
+// otherwise 404 silently in the browser. This is how js/config.js,
+// "js/index - Dev - Test.js" and js/thickness-options.js went unnoticed on
+// curtain-walling-facades.html.
+for (const page of DATA.pages) {
+  const file = path.join(ROOT, page.file);
+  if (!fs.existsSync(file)) continue;
+  const html = fs.readFileSync(file, 'utf8');
+  const refs = [
+    ...html.matchAll(/<script[^>]+src="([^":]+)"/g),
+    ...html.matchAll(/<link[^>]+rel=["']stylesheet["'][^>]+href="([^":]+)"/g)
+  ].map((m) => m[1]).filter((s) => !/^https?:/i.test(s));
+
+  for (const ref of new Set(refs)) {
+    const rel = ref.replace(/^\//, '').replace(/^\.\//, '');
+    if (!fs.existsSync(path.join(ROOT, rel))) warn(`${page.file}: references a missing asset "${ref}" (404)`);
+  }
 }
 
 // ---------- internal links (warning only) ----------
@@ -193,12 +221,34 @@ for (const page of DATA.pages) {
 }
 
 // ---------- report ----------
-for (const f of failures) console.log('FAIL  ' + f);
-for (const w of warnings) console.log('WARN  ' + w);
-console.log(`\n${DATA.pages.length} page(s) checked - ${failures.length} failure(s), ${warnings.length} warning(s)`);
+const reportLines = [];
+for (const f of failures) reportLines.push('FAIL  ' + f);
+for (const w of warnings) reportLines.push('WARN  ' + w);
+const excludedCount = DATA.pages.filter((p) => p.inSitemap === false).length;
+reportLines.push('');
+reportLines.push(`${DATA.pages.length} page(s) checked` +
+  (excludedCount ? ` (${excludedCount} deliberately excluded from sitemap)` : '') +
+  ` - ${failures.length} failure(s), ${warnings.length} warning(s)`);
+reportLines.push(failures.length ? 'SEO check FAILED' : 'SEO check PASSED');
 
-if (failures.length) {
-  console.log('\nSEO check FAILED');
-  process.exit(1);
+reportLines.forEach((line) => console.log(line));
+
+// Optional persisted copy. CI runs with --report and uploads the file as a build
+// artifact, so a failed run is still readable after the job logs expire.
+//   node seo/check-seo.js --report            -> writes seo/seo-report.txt
+//   node seo/check-seo.js --report=out.txt    -> writes out.txt
+const reportArg = process.argv.find((a) => a.startsWith('--report'));
+if (reportArg) {
+  const target = reportArg.includes('=')
+    ? path.resolve(process.cwd(), reportArg.split('=')[1])
+    : path.join(__dirname, 'seo-report.txt');
+  const header = [
+    `SEO report - ${new Date().toISOString()}`,
+    `origin: ${SITE.origin}`,
+    ''
+  ];
+  fs.writeFileSync(target, header.concat(reportLines).join('\n') + '\n');
+  console.log(`\nReport written to ${path.relative(process.cwd(), target) || target}`);
 }
-console.log('SEO check PASSED');
+
+if (failures.length) process.exit(1);

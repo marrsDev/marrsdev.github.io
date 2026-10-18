@@ -283,8 +283,12 @@ function main() {
     summary.push(`${page.file}: faq=${faqs.length}`);
   }
 
-  // sitemap.xml
-  const urls = DATA.pages.map((p) => [
+  // sitemap.xml — pages with "inSitemap": false are deliberately left out
+  // (still generating their head tags, but not advertised until they are ready).
+  const sitemapPages = DATA.pages.filter((p) => p.inSitemap !== false);
+  const excluded = DATA.pages.filter((p) => p.inSitemap === false);
+
+  const urls = sitemapPages.map((p) => [
     '  <url>',
     `    <loc>${esc(SITE.origin + p.path)}</loc>`,
     `    <lastmod>${SITE.lastmod}</lastmod>`,
@@ -307,6 +311,9 @@ function main() {
 
   console.log(`build-seo: processed ${DATA.pages.length} page(s), ${changed} modified`);
   summary.forEach((s) => console.log('  ' + s));
+  if (excluded.length) {
+    console.log(`  excluded from sitemap (inSitemap:false): ${excluded.map((p) => p.file).join(', ')}`);
+  }
   console.log('  wrote sitemap.xml and robots.txt');
 }
 
