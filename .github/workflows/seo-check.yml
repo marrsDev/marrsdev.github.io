@@ -1,0 +1,62 @@
+name: SEO checks
+
+# Works in either repository layout: the published site may be in
+# cb-app.public/ or docs/. The scripts auto-detect which exists, so no
+# configuration is needed here.
+
+on:
+  push:
+    paths:
+      - 'cb-app.public/**'
+      - 'docs/**'
+      - 'seo-tools/**'
+      - '.github/workflows/seo-check.yml'
+  pull_request:
+    paths:
+      - 'cb-app.public/**'
+      - 'docs/**'
+      - 'seo-tools/**'
+  workflow_dispatch:
+
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Hard gate: fails if a page's canonical does not point at that page,
+      # if a title/description is missing, duplicated or too long, if a page
+      # does not have exactly one <h1>, if OG/Twitter tags or JSON-LD are
+      # missing, if a referenced local script/stylesheet does not exist, or if
+      # sitemap.xml / robots.txt are out of date.
+      - name: Validate SEO heads
+        run: node seo-tools/check-seo.js --report
+
+      # Keeps the report readable after the job log rolls over: download it from
+      # the run's "Artifacts" section. Uploads even when the check failed.
+      # seo-tools/ is never published, so the report can never leak to the web.
+      - name: Upload SEO report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-report
+          path: seo-tools/seo-report.txt
+          if-no-files-found: ignore
+
+      # Prevents staleness: if anyone edits a page <head> by hand, changes
+      # pages.json without rebuilding, or hand-edits robots.txt / sitemap.xml,
+      # the regenerated files will differ and this step fails.
+      # Fix by running `node seo-tools/build-seo.js` and committing the result.
+      - name: Verify generated SEO files are up to date
+        run: |
+          node seo-tools/build-seo.js
+          if ! git diff --quiet; then
+            echo "::error::Generated SEO files are out of date. Run 'node seo-tools/build-seo.js' and commit the result."
+            git --no-pager diff --stat
+            exit 1
+          fi
+          echo "Generated files are up to date."
