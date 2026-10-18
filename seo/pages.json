@@ -1,0 +1,100 @@
+{
+  "_comment": "Single source of truth for per-page SEO metadata. Edit this file, then run `node seo/build-seo.js` (from cb-app.public) to regenerate the <head> block, the visually-hidden <h1>, sitemap.xml and robots.txt. `node seo/check-seo.js` validates it and fails CI on problems.",
+  "site": {
+    "origin": "https://capitalbuilders.co.ke",
+    "name": "Capital Builders",
+    "locale": "en_KE",
+    "language": "en-KE",
+    "logo": "/img/Capital builders logo.png",
+    "telephone": "+254724275877",
+    "areaServed": "Kenya",
+    "sameAs": [
+      "https://api.whatsapp.com/send/?phone=254724275877&text&app_absent=0"
+    ],
+    "lastmod": "2026-10-18"
+  },
+  "pages": [
+    {
+      "file": "index.html",
+      "path": "/",
+      "title": "Aluminium Windows Price in Kenya | Instant Calculator",
+      "description": "Instant aluminium window prices in Kenya. Enter your measurements, choose a profile and glass, and get a real quote based on current market rates.",
+      "h1": "Aluminium windows price in Kenya \u2014 instant cost calculator",
+      "ogImage": "/img/og/og-home.jpg",
+      "ogImageAlt": "Capital Builders aluminium windows price calculator for Kenya",
+      "breadcrumb": [{ "name": "Home", "path": "/" }],
+      "sitemap": { "priority": "1.0", "changefreq": "monthly" }
+    },
+    {
+      "file": "aluminium-sliding-windows.html",
+      "path": "/aluminium-sliding-windows.html",
+      "title": "Sliding Windows Price in Kenya | Instant Quote Calculator",
+      "description": "Price aluminium sliding windows in Kenya instantly. Choose 2, 3 or 4 panels, fixed sections and glass to get a live quote in seconds.",
+      "h1": "Aluminium sliding windows price in Kenya \u2014 instant quote calculator",
+      "ogImage": "/img/og/og-sliding-windows.jpg",
+      "ogImageAlt": "Capital Builders aluminium sliding windows price calculator",
+      "breadcrumb": [
+        { "name": "Home", "path": "/" },
+        { "name": "Sliding Windows", "path": "/aluminium-sliding-windows.html" }
+      ],
+      "hasFaq": true,
+      "sitemap": { "priority": "0.9", "changefreq": "monthly" }
+    },
+    {
+      "file": "aluminium-sliding-doors.html",
+      "path": "/aluminium-sliding-doors.html",
+      "title": "Aluminium Sliding Doors Price in Kenya | Instant Quote",
+      "description": "Price aluminium sliding doors in Kenya instantly. Choose single-fixed or no-fixed designs, add insect mesh, and get a live quote in seconds.",
+      "h1": "Aluminium sliding doors price in Kenya \u2014 instant quote calculator",
+      "ogImage": "/img/og/og-sliding-doors.jpg",
+      "ogImageAlt": "Capital Builders aluminium sliding doors price calculator",
+      "breadcrumb": [
+        { "name": "Home", "path": "/" },
+        { "name": "Sliding Doors", "path": "/aluminium-sliding-doors.html" }
+      ],
+      "sitemap": { "priority": "0.9", "changefreq": "monthly" }
+    },
+    {
+      "file": "aluminium-casement-windows.html",
+      "path": "/aluminium-casement-windows.html",
+      "title": "Casement Windows Price in Kenya | Instant Quote Calculator",
+      "description": "Price aluminium casement windows in Kenya instantly. Choose openable or fixed sashes, profile colour and glass for a live quote.",
+      "h1": "Aluminium casement windows price in Kenya \u2014 instant quote calculator",
+      "ogImage": "/img/og/og-casement-windows.jpg",
+      "ogImageAlt": "Capital Builders aluminium casement windows price calculator",
+      "breadcrumb": [
+        { "name": "Home", "path": "/" },
+        { "name": "Casement Windows", "path": "/aluminium-casement-windows.html" }
+      ],
+      "sitemap": { "priority": "0.8", "changefreq": "monthly" }
+    },
+    {
+      "file": "top-hung-windows.html",
+      "path": "/top-hung-windows.html",
+      "title": "Top Hung Windows Price in Kenya | Instant Quote",
+      "description": "Price aluminium top hung windows in Kenya instantly. Choose single or double panels, profile colour and glass for a live quote.",
+      "h1": "Aluminium top hung windows price in Kenya \u2014 instant quote calculator",
+      "ogImage": "/img/og/og-top-hung-windows.jpg",
+      "ogImageAlt": "Capital Builders aluminium top hung windows price calculator",
+      "breadcrumb": [
+        { "name": "Home", "path": "/" },
+        { "name": "Top Hung Windows", "path": "/top-hung-windows.html" }
+      ],
+      "sitemap": { "priority": "0.8", "changefreq": "monthly" }
+    },
+    {
+      "file": "curtain-walling-facades.html",
+      "path": "/curtain-walling-facades.html",
+      "title": "Curtain Walling & Facades Cost in Kenya | Quote",
+      "description": "Estimate custom aluminium curtain walling and facade costs in Kenya. Enter your dimensions for an instant quote at current glass prices.",
+      "h1": "Aluminium curtain walling and facades cost in Kenya \u2014 instant quote",
+      "ogImage": "/img/og/og-curtain-walling.jpg",
+      "ogImageAlt": "Capital Builders aluminium curtain walling and facades",
+      "breadcrumb": [
+        { "name": "Home", "path": "/" },
+        { "name": "Curtain Walling", "path": "/curtain-walling-facades.html" }
+      ],
+      "sitemap": { "priority": "0.7", "changefreq": "monthly" }
+    }
+  ]
+}

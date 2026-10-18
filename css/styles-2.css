@@ -15,6 +15,20 @@ html, body {
     overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
+/* Visually hidden but still read by screen readers and crawlers.
+   Used for the single page <h1> so adding it does not change the layout. */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 /* Ensure all sections span the full width */
 section {
     width: 100%;
@@ -605,9 +619,12 @@ a {
     font-family: Flux-Regular, SourceSansProRegular, Arial, sans-serif;
 }
 
-.list-widgets h1.widget-title {
+.list-widgets .widget-title {
     color: #444444; /* Dark gray color */
     font-size: 1.2rem; /* Font size */
+    /* Explicit top margin replaces the h1 user-agent default now that these
+       section headings are <h2>, so rendering stays identical. */
+    margin-top: 0.67em;
     margin-bottom: 10px; /* Space below the heading */
     font-family: Flux-Regular, SourceSansProRegular, Arial, sans-serif;
 }
@@ -704,9 +721,12 @@ a {
     font-family: Flux-Regular, SourceSansProRegular, Arial, sans-serif;
 }
 
-.blogs-widget h1.widget-title {
+.blogs-widget .widget-title {
     color: #444444; /* Dark gray color */
     font-size: 1.2rem; /* Font size */
+    /* Explicit top margin replaces the h1 user-agent default now that these
+       section headings are <h2>, so rendering stays identical. */
+    margin-top: 0.67em;
     margin-bottom: 10px; /* Space below the heading */
     font-family: Flux-Regular, SourceSansProRegular, Arial, sans-serif;
 }
@@ -888,7 +908,7 @@ a {
     margin-right: 0; /* Remove margin for the last widget */
 }
 
-.widgets-2 h1.widget-title {
+.widgets-2 .widget-title {
     font-family: 'Helvetica', 'Arial', sans-serif; /* Sans-serif font for h1 */
     font-size: 1.2rem; /* Adjust size as needed */
     margin: 0 0 10px 0; /* Adjust margin as needed */
