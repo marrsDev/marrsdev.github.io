@@ -67,6 +67,12 @@ class CartManager {
       type52: { label: '4 Panel Sliding Door, awning top + Insect mesh', category: 'sliding-hybridAluDoor' },
     };
 
+    // A cart arriving via a share link is a READ-ONLY SNAPSHOT. It is only ever
+    // rendered; it is never used as the visitor's working cart. The first edit
+    // forks it into a brand new cart owned by the visitor.
+    this.isViewingSharedCart = false;
+    this.sharedCartId = null;
+
     // First check if we have a cart in URL
     const urlParams = new URLSearchParams(window.location.search);
     const cartParam = urlParams.get('cart');
@@ -84,6 +90,13 @@ class CartManager {
 
   // ========== MOVED THESE METHODS OUTSIDE CONSTRUCTOR ==========
   init() {
+    // A shared cart must NOT have its id replaced by syncCartId(). That is what
+    // previously made a shared link silently show the visitor's own cart.
+    if (this.isViewingSharedCart) {
+      this.loadCart();
+      return;
+    }
+
     // Sync cart ID from localStorage if available
     this.syncCartId();
     this.loadCart();
@@ -200,10 +213,157 @@ class CartManager {
     }
   }
 
+  /** The cart id this browser is currently pointing at (not the shared one). */
+  getStoredCartId() {
+    try {
+      return localStorage.getItem('persistentCartId')
+        || this.getCookie('cartId')
+        || sessionStorage.getItem('sessionCartId')
+        || null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /** Write a cart id to every storage layer syncCartId() reads. */
+  persistCartId(cartId) {
+    try {
+      localStorage.setItem('persistentCartId', cartId);
+      sessionStorage.setItem('sessionCartId', cartId);
+      document.cookie = `cartId=${cartId}; max-age=31536000; path=/; samesite=strict`;
+    } catch (error) {
+      console.warn('Could not persist cart id:', error);
+    }
+  }
+
+  /**
+   * A shared cart is read-only. The first edit creates a brand-new cart -
+   * pre-populated with the snapshot's items - and switches to it, so continuing
+   * from a shared cart can never mutate what the sender shared.
+   *
+   * The visitor's previous cart is NOT deleted or modified: its rows stay intact
+   * in the database, and its id is kept in `preForkCartId` so they can be
+   * returned to it (see returnToOwnCart).
+   */
+  async ensureWritableCart() {
+    if (!this.isViewingSharedCart) return true;
+
+    try {
+      const response = await fetch(this.backendUrl + '/api/cart/fork-shared', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fromCartId: this.sharedCartId })
+      });
+
+      const data = await response.json();
+
+      if (!data.success || !data.cartId) {
+        throw new Error(data.error || 'Could not start a new cart');
+      }
+
+      // Remember the cart this browser had before the fork so it is never
+      // orphaned - only the pointer moves, the rows are untouched.
+      const ownCartId = this.getStoredCartId();
+      if (ownCartId && ownCartId !== this.sharedCartId && ownCartId !== data.cartId) {
+        try {
+          localStorage.setItem('preForkCartId', ownCartId);
+        } catch (error) {
+          console.warn('Could not remember the previous cart id:', error);
+        }
+      }
+
+      this.cartId = data.cartId;
+      this.isViewingSharedCart = false;
+      this.sharedCartId = null;
+
+      // Keep BOTH ids so the switch is reversible: preForkCartId is the visitor's
+      // own cart, forkCartId is the parallel cart copied from the shared one.
+      try {
+        localStorage.setItem('forkCartId', data.cartId);
+      } catch (error) {
+        console.warn('Could not remember the forked cart id:', error);
+      }
+
+      this.persistCartId(this.cartId);
+
+      console.log('🆕 Continuing in a forked cart:', this.cartId);
+      alert('Continuing a new cart from a shared cart');
+
+      return true;
+    } catch (error) {
+      console.error('Error continuing from shared cart:', error);
+      alert(`Could not continue from the shared cart: ${error.message}`);
+      return false;
+    }
+  }
+
+  /**
+   * Switch back to the cart the visitor had before they continued from a shared
+   * one. Nothing was lost in the meantime - this restores the pointer.
+   */
+  /** Switch the active cart. Both ids are kept, so the switch is reversible. */
+  async switchToCart(cartId) {
+    if (!cartId) return false;
+
+    this.cartId = cartId;
+    this.isViewingSharedCart = false;
+    this.sharedCartId = null;
+    this.persistCartId(cartId);
+
+    await this.loadCart();
+    return true;
+  }
+
+  /**
+   * The other cart this browser can switch to, if both ids are known.
+   * Returns { label, action } or null.
+   */
+  getAlternateCart() {
+    try {
+      const ownCartId = localStorage.getItem('preForkCartId');
+      const forkCartId = localStorage.getItem('forkCartId');
+
+      if (!ownCartId || !forkCartId) return null;
+
+      return (this.cartId === forkCartId)
+        ? { label: 'Return to my cart', action: 'returnToOwnCart()' }
+        : { label: 'Go to shared cart', action: 'goToForkedCart()' };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /** Back to the cart this browser had before continuing from a shared one. */
+  async returnToOwnCart() {
+    let ownCartId = null;
+    try {
+      ownCartId = localStorage.getItem('preForkCartId');
+    } catch (error) {
+      console.warn('Could not read the previous cart id:', error);
+    }
+
+    return this.switchToCart(ownCartId);
+  }
+
+  /** Back to the parallel cart that was created from the shared cart. */
+  async goToForkedCart() {
+    let forkCartId = null;
+    try {
+      forkCartId = localStorage.getItem('forkCartId');
+    } catch (error) {
+      console.warn('Could not read the forked cart id:', error);
+    }
+
+    return this.switchToCart(forkCartId);
+  }
+
   async addToCart(itemData) {
     try {
       console.log('🛒 cartManager.addToCart called with:', itemData);
-      
+
+      // Editing a shared cart forks it into the visitor's own cart first.
+      if (!(await this.ensureWritableCart())) return false;
+
       // Ensure we have the latest cart ID
       this.syncCartId();
       
@@ -243,6 +403,8 @@ class CartManager {
 
   async removeItem(itemId) {
     try {
+      if (!(await this.ensureWritableCart())) return false;
+
       const response = await fetch(this.backendUrl + '/api/cart/item/' + itemId, {
         method: 'DELETE',
         headers: {
@@ -267,6 +429,8 @@ class CartManager {
 
   async updateQuantity(itemId, quantity) {
     try {
+      if (!(await this.ensureWritableCart())) return false;
+
       const response = await fetch(this.backendUrl + '/api/cart/item/' + itemId + '/quantity', {
         method: 'PUT',
         headers: {
@@ -293,6 +457,8 @@ class CartManager {
 
   async clearCart() {
     try {
+      if (!(await this.ensureWritableCart())) return false;
+
       const response = await fetch(this.backendUrl + '/api/cart/clear', {
         method: 'DELETE',
         headers: {
@@ -336,11 +502,15 @@ class CartManager {
     
     if (!items || items.length === 0) {
       console.log('🛒 Cart is empty, showing empty state');
+      // The empty branch must still offer the cart switch, otherwise a visitor
+      // whose own cart is empty would have no way back to the parallel cart.
+      const alternate = this.getAlternateCart();
       cartPreview.innerHTML = `
         <div class="cart-container">
           <div class="empty-cart">
             <p>Your cart is empty</p>
           </div>
+          ${alternate ? `<div class="cart-actions"><button onclick="${alternate.action}" class="return-cart-btn">${alternate.label}</button></div>` : ''}
         </div>
       `;
       return;
@@ -418,6 +588,11 @@ class CartManager {
     });
 
     const roundedGrandTotal = Math.round(totals.grandTotal || 0);
+
+    // Offer a reversible switch between this browser's own cart and the parallel
+    // cart created from a shared one. Whichever is active, the button leads to
+    // the other.
+    const alternateCart = this.getAlternateCart();
     
     html += `
         <div class="cart-footer">
@@ -427,6 +602,7 @@ class CartManager {
           </div>
         </div>
         <div class="cart-actions">
+          ${alternateCart ? `<button onclick="${alternateCart.action}" class="return-cart-btn">${alternateCart.label}</button>` : ''}
           <button onclick="cartManager.clearCart()" class="clear-cart-btn">Clear Cart</button>
           <button onclick="exportQuote()" class="export-btn">Contact Us with this order</button>
         </div>
@@ -472,16 +648,9 @@ class CartManager {
     return `${dir}${type}.png`;
   }
 
-  exportQuote() {
+  async exportQuote() {
     try {
-      const consent = localStorage.getItem('cookieConsent');
-      
-      if (consent === 'rejected') {
-        return this.handleSessionCartExport();
-      }
-      
-      return this.handleCookieCartExport();
-      
+      return await this.shareCartOnWhatsApp();
     } catch (error) {
       console.error('Error exporting quote:', error);
       alert('Sorry, there was an error preparing your quote for sharing.');
@@ -489,51 +658,62 @@ class CartManager {
     }
   }
 
-  handleCookieCartExport() {
-    const cartData = {
-      cartId: this.cartId,
-      timestamp: Date.now(),
-      storageType: 'cookie'
-    };
-    
-    const encodedCart = btoa(JSON.stringify(cartData));
-    const shareableLink = `${window.location.origin}${window.location.pathname}?cart=${encodedCart}`;
-    
+  async shareCartOnWhatsApp() {
+    const shareableLink = await this.buildShareableLink();
+    if (!shareableLink) return false;
+
     const whatsappMessage = `Hello! I'm interested in this window configuration: ${shareableLink}`;
     const encodedMessage = encodeURIComponent(whatsappMessage);
-    
+
     window.open(`https://api.whatsapp.com/send/?phone=254724275877&text=${encodedMessage}&app_absent=0`, '_blank');
     return true;
   }
 
+  // Kept as thin aliases so any existing caller keeps working.
+  async handleCookieCartExport() {
+    return this.shareCartOnWhatsApp();
+  }
+
   async handleSessionCartExport() {
-    const shouldSave = confirm('To share your cart, we need to save it to our database first. This will allow us to retrieve it later. Continue?');
-    
-    if (!shouldSave) return false;
-    
+    return this.shareCartOnWhatsApp();
+  }
+
+  /**
+   * Freeze the current cart server-side, then build the link from the SNAPSHOT id.
+   *
+   * This is what makes a shared link immutable: the sender can keep editing their
+   * own cart, and anyone opening an already-sent link still sees exactly what was
+   * sent. A new share therefore produces a new link.
+   */
+  async buildShareableLink() {
+    if (this.isViewingSharedCart) {
+      alert('You are viewing a shared cart. Add or remove an item to start your own cart, then share that.');
+      return null;
+    }
+
     try {
-      const persistentCartId = await this.saveSessionCartToDatabase();
-      if (!persistentCartId) return false;
-      
+      const response = await fetch(this.backendUrl + '/api/cart/share-snapshot', {
+        method: 'POST',
+        headers: { 'X-Cart-ID': this.cartId }
+      });
+
+      const data = await response.json();
+
+      if (!data.success || !data.cartId) {
+        throw new Error(data.error || 'Could not create a shareable cart');
+      }
+
       const cartData = {
-        cartId: persistentCartId,
+        cartId: data.cartId, // the immutable snapshot - NOT this.cartId
         timestamp: Date.now(),
-        storageType: 'database'
+        storageType: 'shared'
       };
-      
-      const encodedCart = btoa(JSON.stringify(cartData));
-      const shareableLink = `${window.location.origin}${window.location.pathname}?cart=${encodedCart}`;
-      
-      const whatsappMessage = `Hello! I'm interested in this window configuration: ${shareableLink}`;
-      const encodedMessage = encodeURIComponent(whatsappMessage);
-      
-      window.open(`https://api.whatsapp.com/send/?phone=254724275877&text=${encodedMessage}&app_absent=0`, '_blank');
-      return true;
-      
+
+      return `${window.location.origin}${window.location.pathname}?cart=${btoa(JSON.stringify(cartData))}`;
     } catch (error) {
-      console.error('Error saving session cart:', error);
-      alert('Failed to save your cart. Please try again or accept cookies to enable sharing.');
-      return false;
+      console.error('Error building shareable link:', error);
+      alert(`Sorry, could not prepare your quote for sharing: ${error.message}`);
+      return null;
     }
   }
 
@@ -559,19 +739,23 @@ class CartManager {
   loadFromSharedCart(cartParam) {
     try {
       const cartData = JSON.parse(atob(cartParam));
-      
-      if (cartData.storageType === 'database') {
-        this.cartId = cartData.cartId;
-        this.isPersistentCart = true;
-      } else {
-        this.cartId = cartData.cartId;
-        this.isPersistentCart = false;
+
+      if (!cartData || !cartData.cartId) {
+        throw new Error('Malformed shared cart link');
       }
-      
-      this.loadCart();
-      
+
+      this.sharedCartId = cartData.cartId;
+      this.isViewingSharedCart = true;
+      // Render this id, but never persist it as the visitor's own cart.
+      this.cartId = cartData.cartId;
+      this.isPersistentCart = cartData.storageType !== 'session';
+
+      console.log('🔗 Viewing shared cart snapshot:', this.sharedCartId);
+
     } catch (error) {
       console.error('Error loading shared cart:', error);
+      this.isViewingSharedCart = false;
+      this.sharedCartId = null;
       this.cartId = this.generateCartId();
     }
   }
@@ -586,6 +770,24 @@ window.cartManager = cartManager;
 window.exportQuote = function() {
   if (window.cartManager) {
     return cartManager.exportQuote();
+  }
+  console.error('Cart manager not initialized');
+  return false;
+};
+
+// Switch back to the cart this browser had before continuing from a shared one.
+window.returnToOwnCart = function() {
+  if (window.cartManager) {
+    return cartManager.returnToOwnCart();
+  }
+  console.error('Cart manager not initialized');
+  return false;
+};
+
+// Switch to the parallel cart created from the shared cart.
+window.goToForkedCart = function() {
+  if (window.cartManager) {
+    return cartManager.goToForkedCart();
   }
   console.error('Cart manager not initialized');
   return false;

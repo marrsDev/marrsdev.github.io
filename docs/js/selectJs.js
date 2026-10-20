@@ -395,6 +395,51 @@ const slidingAluDoorTypes = [
 
 ];
 
+// ============================================ 
+// SLIDING ALU DOOR TYPES (NEW)
+// ============================================
+const windowBlindsTypes = [
+    // Vertical one-way blinds 
+    {
+        id: 'bType1',
+        value: 'vertical-one-way-blind',
+        imageSrc: 'img/type-select-images/bType-1.png',
+        width: '150px',
+        label: 'Vertical one-way blinds',
+        typeKey: 'bType1'
+    },
+
+    // Vertical two-way blinds (center-split)
+    {
+        id: 'bType2',
+        value: 'vertical-two-way-blind',
+        imageSrc: 'img/type-select-images/bType-2.png',
+        width: '150px',
+        label: 'Vertical two-way blinds (center-split)',
+        typeKey: 'bType2'
+    },
+
+    // Zebra Roller blinds 
+    {
+        id: 'bType3',
+        value: 'Zebra-roller-blind',
+        imageSrc: 'img/type-select-images/bType-3.png',
+        width: '150px',
+        label: 'Zebra roller blinds',
+        typeKey: 'bType3'
+    },
+
+    // Plain Roller blinds 
+    {
+        id: 'bType4',
+        value: 'Plain-roller-blind',
+        imageSrc: 'img/type-select-images/bType-4.png',
+        width: '150px',
+        label: 'Plain roller blinds',
+        typeKey: 'bType4'
+    },
+];
+
 // ============================================
 // SLIDING SELECTION
 // ============================================
@@ -1179,10 +1224,144 @@ function initSlidingAluDoorSelection() {
 }
 
 // ============================================
+// WINDOW BLINDS SELECTION
+// ============================================
+let selectedWindowBlindType = null;
+let selectedWindowBlindTypeKey = null;
+
+// Which option group each blind type exposes. Only these are shown, so the
+// control panel matches the design the user picked:
+//   bType1 / bType2 (vertical) -> fabric colour
+//   bType3 (zebra roller)      -> pattern
+//   bType4 (plain roller)      -> colour
+// The installation switch is shown for all four.
+// Colours and patterns are order specifications only - they do not affect price.
+const WINDOW_BLINDS_OPTION_GROUPS = {
+    bType1: ['fabricColour'],
+    bType2: ['fabricColour'],
+    bType3: ['zebra-roller-blinds-patterns'],
+    bType4: ['plain-roller-blinds-colours']
+};
+
+const WINDOW_BLINDS_DESCRIPTIONS = {
+    bType1: 'Vertical one-way blinds',
+    bType2: 'Vertical two-way blinds (centre-split)',
+    bType3: 'Zebra roller blinds',
+    bType4: 'Plain roller blinds'
+};
+
+function updateWindowBlindsOptions(typeKey) {
+    const shown = WINDOW_BLINDS_OPTION_GROUPS[typeKey] || [];
+    const allGroups = ['fabricColour', 'zebra-roller-blinds-patterns', 'plain-roller-blinds-colours'];
+
+    allGroups.forEach(cls => {
+        const el = document.querySelector('.' + cls);
+        if (el) el.style.display = shown.includes(cls) ? '' : 'none';
+    });
+
+    // Installation applies to every blind type - keep it visible.
+    const installToggle = document.getElementById('installation-toggle');
+    if (installToggle) {
+        const li = installToggle.closest('li');
+        if (li) li.style.display = '';
+    }
+}
+
+function selectWindowBlindType(type, element) {
+    document.querySelectorAll('#windowBlindTypeSelector .image-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    if (element) element.classList.add('selected');
+
+    selectedWindowBlindType = type;
+    selectedWindowBlindTypeKey = type.typeKey;
+    // Globals so app.js can read the selection across script boundaries.
+    window.selectedWindowBlindTypeKey = type.typeKey;
+    window.selectedWindowBlindType = type.value;
+
+    // Preview image and descriptor (the tiles themselves carry no text labels).
+    const previewImg = document.getElementById('img-type');
+    if (previewImg) {
+        previewImg.src = type.imageSrc;
+        previewImg.alt = WINDOW_BLINDS_DESCRIPTIONS[type.typeKey] || type.label;
+    }
+    const typeCode = document.getElementById('type-code');
+    if (typeCode) {
+        typeCode.textContent = '- ' + (WINDOW_BLINDS_DESCRIPTIONS[type.typeKey] || type.label);
+    }
+
+    updateWindowBlindsOptions(type.typeKey);
+
+    console.log(`Selected blinds type: ${type.value} (key: ${type.typeKey})`);
+
+    document.dispatchEvent(new CustomEvent('windowBlindsChanged', {
+        detail: { typeKey: type.typeKey, value: type.value }
+    }));
+}
+
+function initWindowBlindSelection() {
+    const selector = document.getElementById('windowBlindTypeSelector');
+    if (!selector) return;
+
+    selector.innerHTML = '';
+
+    windowBlindsTypes.forEach(type => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'image-option';
+        optionDiv.dataset.type = type.value;
+        optionDiv.dataset.id = type.id;
+        optionDiv.dataset.typeKey = type.typeKey;
+
+        optionDiv.innerHTML = `
+            <img src="${type.imageSrc}" alt="${type.label}" width="${type.width}" height="110">
+        `;
+
+        optionDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectWindowBlindType(type, optionDiv);
+        });
+
+        selector.appendChild(optionDiv);
+    });
+
+    // Installation defaults to ON (green) and only turns off if the user does.
+    const installToggle = document.getElementById('installation-toggle');
+    if (installToggle) {
+        installToggle.checked = true;
+        installToggle.dataset.defaultOn = 'true';
+    }
+
+    // Restore a previous selection, else select the first design.
+    const preselected = localStorage.getItem('selectedWindowBlindType');
+    let initialType = windowBlindsTypes[0];
+    let initialEl = selector.querySelector('.image-option');
+
+    if (preselected) {
+        const matchedType = windowBlindsTypes.find(t => t.value === preselected);
+        const matchedEl = selector.querySelector(`.image-option[data-type="${preselected}"]`);
+        if (matchedType && matchedEl) {
+            initialType = matchedType;
+            initialEl = matchedEl;
+        }
+    }
+
+    if (initialType && initialEl) {
+        selectWindowBlindType(initialType, initialEl);
+    }
+}
+
+window.selectWindowBlindType = selectWindowBlindType;
+window.initWindowBlindSelection = initWindowBlindSelection;
+window.getSelectedWindowBlindType = () => selectedWindowBlindType;
+
+// ============================================
 // INITIALIZATION (UPDATED)
 // ============================================
 function initAllSelections() {
     // Initialize based on which selector exists on the page
+    if (document.getElementById('windowBlindTypeSelector')) {
+        initWindowBlindSelection();
+    }
     if (document.getElementById('casementTypeSelector')) {
         initCasementSelection();
         // Nudge after a short delay for casement - cookie aware

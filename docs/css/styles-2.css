@@ -516,7 +516,7 @@ a {
   border-top: 1px solid #ddd;
 }
 
-.clear-cart-btn, .export-btn {
+.clear-cart-btn, .export-btn, .return-cart-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
@@ -540,6 +540,15 @@ a {
 
 .export-btn:hover {
   background: #229954;
+}
+
+.return-cart-btn {
+  background: #1c3b56;
+  color: white;
+}
+
+.return-cart-btn:hover {
+  background: #142b3f;
 }
 
 .empty-cart {
@@ -1177,7 +1186,7 @@ a {
     gap: 8px;
   }
   
-  .clear-cart-btn, .export-btn {
+  .clear-cart-btn, .export-btn, .return-cart-btn {
     padding: 8px 12px;
     font-size: 0.9em;
   }
@@ -1505,7 +1514,7 @@ a {
     gap: 8px;
   }
   
-  .clear-cart-btn, .export-btn {
+  .clear-cart-btn, .export-btn, .return-cart-btn {
     width: 100%;
     text-align: center;
     padding: 10px;

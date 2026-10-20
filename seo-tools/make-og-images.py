@@ -49,6 +49,7 @@ CARDS = [
     ("og-sliding-doors.jpg", "Sliding Doors", "Price in Kenya", "Instant quote calculator"),
     ("og-casement-windows.jpg", "Casement Windows", "Price in Kenya", "Instant quote calculator"),
     ("og-top-hung-windows.jpg", "Top Hung Windows", "Price in Kenya", "Instant quote calculator"),
+    ("og-window-blinds.jpg", "Window Blinds", "Price in Kenya", "Instant quote calculator"),
     ("og-curtain-walling.jpg", "Curtain Walling", "& Facades", "Instant quote calculator"),
 ]
 

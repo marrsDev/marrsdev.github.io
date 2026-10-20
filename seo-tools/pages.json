@@ -84,6 +84,20 @@
       "sitemap": { "priority": "0.8", "changefreq": "monthly" }
     },
     {
+      "file": "window-blinds.html",
+      "path": "/window-blinds.html",
+      "title": "Window Blinds Price in Kenya | Instant Quote",
+      "description": "Price window blinds in Kenya instantly. Choose between vertical and roller styles, material type, colour and options for a live quote.",
+      "h1": "Window blinds price in Kenya \u2014 instant quote calculator",
+      "ogImage": "/img/og/og-window-blinds.jpg",
+      "ogImageAlt": "Capital Builders window blinds price calculator",
+      "breadcrumb": [
+        { "name": "Home", "path": "/" },
+        { "name": "Window Blinds", "path": "/window-blinds.html" }
+      ],
+      "sitemap": { "priority": "0.8", "changefreq": "monthly" }
+    },
+    {
       "file": "curtain-walling-facades.html",
       "path": "/curtain-walling-facades.html",
       "title": "Curtain Walling & Facades Cost in Kenya | Quote",

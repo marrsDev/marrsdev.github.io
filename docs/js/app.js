@@ -684,6 +684,9 @@ if (doorHasFixedHeight) {
             case 'slidingAluDoors':
                 result = await calculateSlidingAluDoorCost();
                 break;
+            case 'blinds':
+                result = await calculateWindowBlindsCost();
+                break;
             case 'sliding':
             default:
                 result = await calculateSlidingCost();
@@ -699,6 +702,108 @@ if (doorHasFixedHeight) {
                 cost: result.cost,
                 breakdown: result.breakdown || {}
             };
+        }
+    }
+
+    // ============================================
+    // WINDOW BLINDS CALCULATION (area-priced)
+    // ============================================
+    async function calculateWindowBlindsCost() {
+        const height = parseInt(document.getElementById('heightId')?.value || 0);
+        const width = parseInt(document.getElementById('widthId')?.value || 0);
+        const blindTypeKey = window.selectedWindowBlindTypeKey || null;
+
+        // The installation switch defaults to ON; only an explicit untick
+        // removes it from the quote.
+        const installationToggle = document.getElementById('installation-toggle');
+        const installation = installationToggle ? installationToggle.checked : true;
+
+        if (!blindTypeKey) {
+            alert('Please select a blind design');
+            return null;
+        }
+
+        if (!height || !width || height <= 0 || width <= 0) {
+            alert('Please enter valid height and width values');
+            return null;
+        }
+
+        // Mirrors the backend guard: no side may be 100mm or less.
+        if (height <= 100 || width <= 100) {
+            alert('Height and width must each be greater than 100mm');
+            return null;
+        }
+
+        // The colour/pattern is recorded with the order but does not affect the
+        // price, so it is captured for the cart rather than the calculation.
+        const fabricColour = document.getElementById('verticalBlindsFabricColour')?.value || null;
+        const zebraPattern = document.getElementById('zebraRollerBlindsPattern')?.value || null;
+        const plainColour = document.getElementById('plainRollerBlindsColour')?.value || null;
+
+        let blindColour = null;
+        if (blindTypeKey === 'bType1' || blindTypeKey === 'bType2') {
+            blindColour = fabricColour;
+        } else if (blindTypeKey === 'bType3') {
+            blindColour = zebraPattern;
+        } else if (blindTypeKey === 'bType4') {
+            blindColour = plainColour;
+        }
+
+        console.log('Calculating window blinds cost:', {
+            height, width, blindTypeKey, installation, blindColour
+        });
+
+        try {
+            const requestData = {
+                height,
+                width,
+                blindTypeKey,
+                installation
+            };
+
+            const response = await fetch(`${HEROKU_BACKEND_URL}/api/calculations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                // Surface the server's own message (e.g. dimension validation).
+                let serverMessage = '';
+                try {
+                    const errorBody = await response.json();
+                    serverMessage = errorBody?.message || errorBody?.error || '';
+                } catch (_) { /* non-JSON error body */ }
+                throw new Error(serverMessage || `Network response was not ok: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.success && data.totalCost !== undefined) {
+                return {
+                    cost: data.totalCost,
+                    breakdown: data.breakdown,
+                    requestData: {
+                        ...requestData,
+                        blindColour,
+                        blindTypeValue: window.selectedWindowBlindType || null
+                    }
+                };
+            } else {
+                throw new Error('Invalid response format from server');
+            }
+
+        } catch (error) {
+            console.error('Error calculating window blinds cost:', error);
+            alert(`Error calculating cost: ${error.message}`);
+            if (error.message.includes('Failed to fetch')) {
+                alert('Calculator engine is waking up. Please give it a few seconds.');
+            }
+            return null;
         }
     }
 
@@ -1478,7 +1583,8 @@ if (doorHasFixedHeight) {
             'office-partitions.html': 'partitions',
             'glass-types.html': 'glass',
             'index.html': 'sliding',
-            'aluminium-casement-windows.html': 'casement'
+            'aluminium-casement-windows.html': 'casement',
+            'window-blinds.html': 'blinds'
         };
         
         if (pageMap[filename]) {
