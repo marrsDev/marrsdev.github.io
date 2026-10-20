@@ -33,7 +33,7 @@
             margin-bottom: 25px;
         }
         
-        .select-casement-type, .select-top-hung-type {
+        .select-casement-type, .select-top-hung-type, .select-window-blind-type {
             display: flex;
             overflow-x: auto;
             gap: 15px;
