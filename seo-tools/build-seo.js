@@ -247,11 +247,19 @@ function buildH1Block(page) {
 function transform(html, page) {
   const faqs = extractFaqs(html);
 
-  // 1. remove previously generated blocks. The leading \n is the exact newline
+  // Match the file's EXISTING line endings. Some pages are hand-maintained with
+  // CRLF (Windows) endings; writing LF into a CRLF file rewrote every line of the
+  // generated block on every build, so the CI "up to date" check failed forever
+  // even though the content was identical (a perfectly symmetric +N/-N diff).
+  const usesCRLF = html.includes('\r\n');
+  const eol = usesCRLF ? '\r\n' : '\n';
+  const toEol = (text) => (usesCRLF ? text.replace(/\r\n/g, '\n').replace(/\n/g, '\r\n') : text);
+
+  // 1. remove previously generated blocks. The leading newline is the exact one
   //    the insertion step below adds, so re-running the build leaves the file
   //    byte-identical instead of nibbling the indentation of the next line.
-  html = html.replace(/\n<!-- SEO:HEAD:START[\s\S]*?<!-- SEO:HEAD:END -->/g, '');
-  html = html.replace(/\n<!-- SEO:H1:START[\s\S]*?<!-- SEO:H1:END -->/g, '');
+  html = html.replace(/\r?\n<!-- SEO:HEAD:START[\s\S]*?<!-- SEO:HEAD:END -->/g, '');
+  html = html.replace(/\r?\n<!-- SEO:H1:START[\s\S]*?<!-- SEO:H1:END -->/g, '');
 
   // 2. remove hand-written equivalents so nothing is duplicated
   html = html.replace(/<title>[\s\S]*?<\/title>\s*/gi, '');
@@ -264,21 +272,21 @@ function transform(html, page) {
   //    viewport meta). These pages carry a large inline <style>, and some social
   //    crawlers only read the first part of a document, so metadata placed just
   //    before </head> can be missed.
-  const headBlock = buildHeadBlock(page, faqs);
+  const headBlock = toEol(buildHeadBlock(page, faqs));
   const anchor = html.match(/<meta[^>]+name=["']viewport["'][^>]*>/i)
     || html.match(/<meta[^>]+charset=["'][^"']*["'][^>]*>/i)
     || html.match(/<head[^>]*>/i);
   if (!anchor) throw new Error(page.file + ': no <head> anchor found');
   html = html.slice(0, anchor.index + anchor[0].length) +
-    '\n' + headBlock +
+    eol + headBlock +
     html.slice(anchor.index + anchor[0].length);
 
   // 4. inject the visually-hidden h1 immediately after <body>
   const bodyMatch = html.match(/<body[^>]*>/i);
   if (!bodyMatch) throw new Error(page.file + ': no <body> found');
-  const h1Block = buildH1Block(page);
+  const h1Block = toEol(buildH1Block(page));
   html = html.slice(0, bodyMatch.index + bodyMatch[0].length) +
-    '\n' + h1Block +
+    eol + h1Block +
     html.slice(bodyMatch.index + bodyMatch[0].length);
 
   return { html, faqs };
