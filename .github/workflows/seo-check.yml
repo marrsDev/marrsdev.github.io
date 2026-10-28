@@ -57,6 +57,7 @@ jobs:
           if ! git diff --quiet; then
             echo "::error::Generated SEO files are out of date. Run 'node seo-tools/build-seo.js' and commit the result."
             git --no-pager diff --stat
+            echo "Hint: an exactly symmetric +N/-N diff (same files, same counts) is almost always line endings (CRLF vs LF), not content."
             exit 1
           fi
           echo "Generated files are up to date."
