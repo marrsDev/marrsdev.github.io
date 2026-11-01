@@ -446,7 +446,7 @@ a {
   color: #e74c3c;
   cursor: pointer;
   padding: 2px 2px;
-  font-size: 0.6em;
+  font-size: 0.8em;
 }
 
 .remove-btn:hover {
@@ -1640,4 +1640,92 @@ a {
         font-size: 0.8rem;
         white-space: nowrap; /* never break a label mid-phrase */
     }
+}
+
+/* ------------------------------------------------------------------
+   Cart item: "More info" button + its overlay panel.
+
+   The panel is an in-page overlay (position: fixed, very high z-index),
+   not a modal window. It closes when the same button is clicked again,
+   when anything outside it is clicked, or on Escape.
+   ------------------------------------------------------------------ */
+.more-info-btn {
+    background: none;
+    border: none;
+    color: #204665;
+    cursor: pointer;
+    padding: 2px 2px;
+    margin-left: 8px;
+    font-size: 0.8em;
+}
+
+.more-info-btn:hover {
+    text-decoration: underline;
+}
+
+.more-info-panel {
+    position: fixed;
+    z-index: 2147483000;
+    width: 260px;
+    max-width: calc(100vw - 24px);
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 14px 16px 12px;
+    border-radius: 12px;
+    border: 1px solid #000;
+    /* soft top-to-bottom fade so it reads as a floating layer */
+    background-color: #fff;
+    background-image: linear-gradient(180deg, #ffffff 0%, #eef1f5 100%);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+    color: #111;
+    font-size: 0.85rem;
+    line-height: 1.35;
+}
+
+/* fading shade along the bottom edge, so the panel edge fades out */
+.more-info-panel::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 26px;
+    border-radius: 0 0 12px 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.07));
+    pointer-events: none;
+}
+
+.more-info-panel h5 {
+    margin: 0 18px 10px 0;
+    font-size: 0.95rem;
+    color: #204665;
+}
+
+.more-info-panel dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 10px;
+    margin: 0;
+}
+
+.more-info-panel dt {
+    color: #5a6b7b;
+    font-weight: 600;
+}
+
+.more-info-panel dd {
+    margin: 0;
+    text-align: right;
+}
+
+.more-info-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    color: #000;
 }

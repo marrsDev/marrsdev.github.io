@@ -95,6 +95,42 @@ class CartManager {
     }
     
     this.init();
+
+    // Dismiss the "More info" overlay on any click outside it, on Escape, and
+    // keep it anchored to its button while the page moves.
+    document.addEventListener('click', (e) => {
+      const panel = document.getElementById('more-info-panel');
+      if (!panel) return;
+      if (panel.contains(e.target)) return;
+      if (e.target.closest && e.target.closest('.more-info-btn')) return;
+      panel.remove();
+      this.moreInfoTrigger = null;
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        const panel = document.getElementById('more-info-panel');
+        if (panel) {
+          panel.remove();
+          this.moreInfoTrigger = null;
+        }
+      }
+    });
+
+    const reposition = () => {
+      const panel = document.getElementById('more-info-panel');
+      if (!panel || !this.moreInfoTrigger) return;
+      const rect = this.moreInfoTrigger.getBoundingClientRect();
+      // Drop it if its button has scrolled away, otherwise follow it.
+      if (rect.bottom < 0 || rect.top > window.innerHeight) {
+        panel.remove();
+        this.moreInfoTrigger = null;
+        return;
+      }
+      this.positionMoreInfo(panel, this.moreInfoTrigger);
+    };
+    window.addEventListener('scroll', reposition, { passive: true });
+    window.addEventListener('resize', reposition);
   }
 
   // ========== MOVED THESE METHODS OUTSIDE CONSTRUCTOR ==========
@@ -490,6 +526,104 @@ class CartManager {
     }
   }
 
+  /** Friendly product noun for the detail panel: Window / Door / Blind / ... */
+  getItemNoun(category) {
+    if (!category) return 'Item';
+    if (category === 'blinds') return 'Blind';
+    if (category === 'facades') return 'Facade';
+    if (category === 'partitions') return 'Partition';
+    if (/door/i.test(category)) return 'Door';
+    return 'Window';
+  }
+
+  /**
+   * Toggle the "More info" overlay for one cart item.
+   * Clicking the same button again closes it; clicking anywhere outside also
+   * closes it (see the document listener set up in the constructor).
+   */
+  showMoreInfo(itemId, trigger, evt) {
+    if (evt && typeof evt.stopPropagation === 'function') evt.stopPropagation();
+
+    const openPanel = document.getElementById('more-info-panel');
+    const sameItem = openPanel && openPanel.dataset.itemId === String(itemId);
+    if (openPanel) openPanel.remove();
+    if (sameItem) {
+      this.moreInfoTrigger = null;
+      return;                       // second click on the same button = close
+    }
+
+    const item = (this.cartItems || []).find((i) => String(i._id) === String(itemId));
+    if (!item || !trigger) return;
+
+    // renderCart pushes COPIES carrying typeInfo, so the stored array may not
+    // have it - resolve the label/category defensively rather than throwing.
+    const typeInfo = item.typeInfo
+      || this.typeLabels[item.type]
+      || { label: item.type, category: item.category || 'other' };
+
+    const noun = this.getItemNoun(typeInfo.category);
+    const glass = item.glazingExcluded
+      ? 'Excluded'
+      : `${item.glassThickness} ${item.glassType}`;
+
+    const rows = [
+      [`${noun} width`, `${item.measurements.width} mm`],
+      [`${noun} height`, `${item.measurements.height} mm`]
+    ];
+    if (item.ventWidth !== undefined && item.ventWidth !== null) {
+      rows.push(['Vent width', `${item.ventWidth} mm`]);
+    }
+    if (item.ventHeight !== undefined && item.ventHeight !== null) {
+      rows.push(['Vent height', `${item.ventHeight} mm`]);
+    }
+    rows.push(['Color', item.profileColour]);
+    if (item.profileGauge) rows.push(['Gauge', item.profileGauge]);
+    rows.push(['Glass', glass]);
+    rows.push(['Type code', item.type]);
+
+    const panel = document.createElement('div');
+    panel.id = 'more-info-panel';
+    panel.className = 'more-info-panel';
+    panel.dataset.itemId = String(itemId);
+    panel.innerHTML = `
+      <button class="more-info-close" title="Close" onclick="cartManager.hideMoreInfo(event)">&times;</button>
+      <h5>${typeInfo.label}</h5>
+      <dl>${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+    `;
+
+    document.body.appendChild(panel);
+    this.moreInfoTrigger = trigger;
+    this.positionMoreInfo(panel, trigger);
+  }
+
+  /** Place the panel beside its button, keeping it inside the viewport. */
+  positionMoreInfo(panel, trigger) {
+    const rect = trigger.getBoundingClientRect();
+    const margin = 8;
+    const panelW = panel.offsetWidth || 260;
+    const panelH = panel.offsetHeight || 220;
+
+    let left = rect.right + margin;
+    if (left + panelW > window.innerWidth - margin) {
+      left = Math.max(margin, rect.left - panelW - margin);
+    }
+
+    let top = rect.top;
+    if (top + panelH > window.innerHeight - margin) {
+      top = Math.max(margin, window.innerHeight - panelH - margin);
+    }
+
+    panel.style.left = `${left}px`;
+    panel.style.top = `${top}px`;
+  }
+
+  hideMoreInfo(evt) {
+    if (evt && typeof evt.stopPropagation === 'function') evt.stopPropagation();
+    const panel = document.getElementById('more-info-panel');
+    if (panel) panel.remove();
+    this.moreInfoTrigger = null;
+  }
+
   renderCart(cartData) {
     console.log('🎨 renderCart called with data:', cartData);
     
@@ -507,6 +641,8 @@ class CartManager {
     }
 
     const { items, totals } = cartData;
+    // Kept for the "More info" overlay, which looks items up by id.
+    this.cartItems = items || [];
     console.log('📦 Cart data:', { items, totals });
     
     if (!items || items.length === 0) {
@@ -587,6 +723,7 @@ class CartManager {
               ${item.profileGauge ? `<p>Gauge: ${item.profileGauge}</p>` : ''}
               <p>Glass: ${glassLabel}</p>
               <button class="remove-btn" onclick="cartManager.removeItem('${item._id}')">Remove</button>
+              <button class="more-info-btn" onclick="cartManager.showMoreInfo('${item._id}', this, event)">More info</button>
             </div>
             <div class="price">
               Ksh ${Math.round(item.unitPrice).toLocaleString()}
