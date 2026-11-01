@@ -1699,6 +1699,7 @@ a {
     margin: 0 18px 10px 0;
     font-size: 0.95rem;
     color: #204665;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 .more-info-panel dl {
@@ -1711,11 +1712,13 @@ a {
 .more-info-panel dt {
     color: #5a6b7b;
     font-weight: 600;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 .more-info-panel dd {
     margin: 0;
     text-align: right;
+    font-family: Consolas, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, sans-serif;
 }
 
 .more-info-close {
