@@ -15,6 +15,14 @@ const HEROKU_BACKEND_URL = window.HEROKU_BACKEND_URL || 'http://localhost:3000';
 const ALU_DOOR_MIN_OPENABLE_HEIGHT = 1800;
 const ALU_DOOR_DEFAULT_FIXED_HEIGHT = 500;
 
+// Steel doors follow the SAME 1800mm openable-height rule as aluminium doors.
+// Kept as separate constants (not reused) so the steel naming stays distinct and
+// the two rules can be tuned independently. Must match
+// STEEL_DOOR_MIN_OPENABLE_HEIGHT / STEEL_DOOR_DEFAULT_FIXED_HEIGHT in
+// cb-app.backend/services/steelCalculationServiceBridge.js.
+const STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT = 1800;
+const STEEL_SLIDING_DOOR_DEFAULT_FIXED_HEIGHT = 500;
+
 document.addEventListener('DOMContentLoaded', function() {
     if (IS_DEV) {
         console.log('DOM fully loaded');
@@ -44,6 +52,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const addToCartButton = document.getElementById('add-to-cart');
     if (addToCartButton) {
         addToCartButton.addEventListener('click', addToCart);
+    }
+
+    // Steel pages: "Exclude glazing?" re-prices the quote already on screen, so the
+    // cost box updates without pressing Calculate again. Toggling before the first
+    // calculation does nothing (there is no quote to revise yet).
+    const glazingToggle = document.getElementById('glazing-toggle');
+    if (glazingToggle) {
+        glazingToggle.addEventListener('change', () => {
+            const costBox = document.getElementById('cost');
+            if (costBox && costBox.value) {
+                calculateCost(currentPage);
+            }
+        });
     }
     
     // Add event listeners for preview updates (with null checks)
@@ -268,7 +289,137 @@ if (fixedHeight !== null && !isNaN(fixedHeight)) {
     }
 
     // ============================================
-    // SLIDING DOOR CALCULATION (UPDATED)
+    // STEEL SLIDING WINDOW CALCULATION (UPDATED)
+    // ============================================
+    async function calculateSteelSlidingWindowCost() {
+        // Get values for sliding windows
+        const height = parseInt(document.getElementById('heightId')?.value || 0);
+        const width = parseInt(document.getElementById('widthId')?.value || 0);
+        const profileColour = document.getElementById('profileColour')?.value || 'white';
+        const profileGauge = document.getElementById('profileGauge')?.value || '14G_1.9';
+        const glassType = document.getElementById('glassType')?.value || 'clear';
+        const glassThickness = document.getElementById('glassThickness')?.value || '4mm';
+        
+        let selectedTypeKey = window.selectedSteelSlidingWindowTypeKey || null;
+        
+        // Log the current selection for debugging
+        console.log(`🔑 Selected type key from window: ${selectedTypeKey}`);
+        
+        // If no type selected yet, default to steelType1
+        if (!selectedTypeKey) {
+            console.log('⚠️ No sliding type selected, defaulting to steelType1');
+            selectedTypeKey = 'steelType1';
+        }
+        
+        // Get fixed height if applicable
+        let fixedHeight = null;
+        const fixedHeightInput = document.getElementById('fixedHeightInput');
+        if (fixedHeightInput && fixedHeightInput.value.trim() !== '') {
+            fixedHeight = parseInt(fixedHeightInput.value);
+        }
+        
+        // If no fixed height but type supports it, use default 500
+        if (fixedHeight === null || isNaN(fixedHeight)) {
+            const selectedType = window.getSelectedSteelSlidingWindowType ? window.getSelectedSteelSlidingWindowType() : null;
+            if (selectedType && selectedType.hasFixedHeight) {
+                fixedHeight = 500; // Default
+            }
+        }
+        
+        // Validate inputs
+        if (!height || !width || height <= 0 || width <= 0) {
+            alert('Please enter valid height and width values');
+            return null;
+        }
+        
+// Validate fixed height if provided
+if (fixedHeight !== null && !isNaN(fixedHeight)) {
+    // Check if this is a double fixed type
+    const isDoubleFixed = selectedTypeKey === 'steelType3' || 
+                         selectedTypeKey === 'steelType6' || 
+                         selectedTypeKey === 'steelType9';
+    
+    // Calculate total fixed height
+    const totalFixedHeight = isDoubleFixed ? fixedHeight * 2 : fixedHeight;
+    const openableHeight = height - totalFixedHeight;
+    
+    // Different minimums for single vs double fixed
+    const minOpenableHeight = isDoubleFixed ? height * 0.5 : height * 0.6;
+    
+    if (openableHeight < minOpenableHeight) {
+        if (isDoubleFixed) {
+            alert(`Fixed height of ${fixedHeight}mm each (${totalFixedHeight}mm total) is too large. The sliding section would be only ${openableHeight}mm (${(openableHeight/height*100).toFixed(0)}% of total). Please select a different design or reduce the 'Fixed Height input'.`);
+        } else {
+            alert(`Fixed height of ${fixedHeight}mm is too large. The sliding section would be only ${openableHeight}mm (${(openableHeight/height*100).toFixed(0)}% of total). Please select a different design or reduce the 'Fixed Height input'.`);
+        }
+        return null;
+    }
+}
+        
+        console.log('Calculating steel sliding window cost:', {
+            height, width, profileColour, selectedTypeKey, fixedHeight, glassType, glassThickness
+        });
+        
+        try {
+            const requestData = {
+                height,
+                width,
+                // Steel resolves through its OWN key. The aluminium fields are
+                // deliberately not sent, so a steel window can never be silently
+                // quoted as an aluminium type1.
+                steelSlidingWindowTypeKey: selectedTypeKey,
+                fixedHeight: fixedHeight,
+                glassType,
+                glassThickness,
+                // Steel is priced by material GAUGE, not by profile colour, but the
+                // colour is still the customer's chosen finish and is recorded with
+                // the order (and shown on the cart line).
+                profileColour,
+                profileGauge,
+                // "Exclude glazing?" switch: drops the glass and double tape, and
+                // with them their share of the installation charge.
+                excludeGlazing: !!(document.getElementById('glazing-toggle')?.checked)
+            };
+            
+            const response = await fetch(`${HEROKU_BACKEND_URL}/api/steel-calculations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+            
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.status}`);
+            }
+            
+            const data = await response.json();
+
+            
+            if (data.success && data.totalCost !== undefined) {
+                return {
+                    cost: data.totalCost,
+                    breakdown: data.breakdown,
+                    requestData
+                };
+            } else {
+                throw new Error('Invalid response format from server');
+            }
+            
+        } catch (error) {
+            console.error('Error calculating sliding cost:', error);
+            alert('Error calculating cost. Please try again.');
+            if (error.message.includes('Failed to fetch')) {
+                alert('Calculator engine is waking up. Please give it a few seconds.');
+            }
+            return null;
+        }
+    }
+
+    // ============================================
+    // ALUMINIUM SLIDING DOOR CALCULATION (UPDATED)
     // ============================================
     async function calculateSlidingAluDoorCost() {
         // Get values for sliding doors
@@ -414,6 +565,164 @@ if (doorHasFixedHeight) {
             return null;
         }
     }
+
+    // ============================================
+    // STEEL SLIDING DOOR CALCULATION (UPDATED)
+    // ============================================
+    async function calculateSteelSlidingDoorCost() {
+        // Get values for sliding doors
+        const height = parseInt(document.getElementById('heightId')?.value || 0);
+        const width = parseInt(document.getElementById('widthId')?.value || 0);
+        const profileColour = document.getElementById('profileColour')?.value || 'white';
+        const profileGauge = document.getElementById('profileGauge')?.value || '14G_1.9';
+        const glassType = document.getElementById('glassType')?.value || 'clear';
+        const glassThickness = document.getElementById('glassThickness')?.value || '4mm';
+        
+        let selectedTypeKey = window.selectedSteelSlidingDoorTypeKey || null;
+        
+        // Log the current selection for debugging
+        console.log(`🔑 Selected type key from sliding alu door: ${selectedTypeKey}`);
+        
+        // If no type selected yet, default to type31
+        if (!selectedTypeKey) {
+            console.log('⚠️ No steel sliding door type selected, defaulting to steelType31');
+            selectedTypeKey = 'steelType31';
+        }
+        
+        // Sliding doors are single-fixed or no-fixed only - never double fixed.
+        // Derive "needs a fixed height" from the selector metadata rather than a
+        // hardcoded list, so the two cannot drift apart.
+        const selectedSteelSlidingDoorType = window.getSelectedSteelSlidingDoorType ? window.getSelectedSteelSlidingDoorType() : null;
+        const doorHasFixedHeight = !!(selectedSteelSlidingDoorType && selectedSteelSlidingDoorType.hasFixedHeight);
+        
+        // Get fixed height if applicable. Track whether the user actually typed a
+        // value: the 1800mm minimum is a hard constraint on user input, whereas the
+        // 500mm default is always allowed through (it warns instead of blocking).
+        let fixedHeight = null;
+        let userSuppliedFixedHeight = false;
+        const fixedHeightInput = document.getElementById('fixedHeightInput');
+        if (fixedHeightInput && fixedHeightInput.value.trim() !== '') {
+            const parsedFixedHeight = parseInt(fixedHeightInput.value);
+            if (!isNaN(parsedFixedHeight)) {
+                fixedHeight = parsedFixedHeight;
+                userSuppliedFixedHeight = true;
+            }
+        }
+        
+        if (!doorHasFixedHeight) {
+            // A no-fixed door type must not carry a stale value from the hidden input
+            fixedHeight = null;
+            userSuppliedFixedHeight = false;
+        } else if (!userSuppliedFixedHeight) {
+            // Default: leave a 500mm fixed partition, so openable = height - 500
+            fixedHeight = STEEL_SLIDING_DOOR_DEFAULT_FIXED_HEIGHT;
+        }
+        
+        // Validate inputs
+        if (!height || !width || height <= 0 || width <= 0) {
+            alert('Please enter valid height and width values');
+            return null;
+        }
+        
+// A door with a fixed partition must leave at least 1800mm of openable height.
+// `fixedHeight` is already either the user's value or STEEL_SLIDING_DOOR_DEFAULT_FIXED_HEIGHT
+// at this point, so this single check covers both the user-supplied and the default
+// case. The calculation is denied and the equivalent no-fixed door type is selected
+// for the user, who can accept it or switch back and enter a smaller fixed height.
+if (doorHasFixedHeight) {
+    const openableHeight = height - fixedHeight;
+    
+    if (openableHeight < STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT) {
+        const fallbackKey = window.getSteelSlidingDoorNoFixedFallback
+            ? window.getSteelSlidingDoorNoFixedFallback(selectedTypeKey)
+            : null;
+        const fallbackType = (fallbackKey && window.selectSteelSlidingDoorTypeByKey)
+            ? window.selectSteelSlidingDoorTypeByKey(fallbackKey)
+            : null;
+        
+        if (fallbackType) {
+            // The substitute is selected before the dialog opens, so the type
+            // selector already shows it once the dialog is dismissed.
+            alert(`⚠️ Openable door will be very short. A type without a fixed partition has been selected for you, just press the calculate button, OR, change back to your desired design and set a smaller fixed height`);
+        } else {
+            // Unreachable while every fixed-partition type has a fallback mapping,
+            // but kept so a missing mapping degrades to a clear message.
+            const maxFixedHeight = height - STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT;
+            const remedy = maxFixedHeight > 0
+                ? `Choose a door type without a fixed partition, or reduce the fixed height to ${maxFixedHeight}mm or less.`
+                : `Choose a door type without a fixed partition - at ${height}mm height there is no room for one.`;
+            alert(`⚠️ ${userSuppliedFixedHeight ? `Fixed height of ${fixedHeight}mm` : `The default ${fixedHeight}mm fixed partition`} leaves only ${openableHeight}mm openable, below the ${STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT}mm minimum for a door. ${remedy}`);
+        }
+        return null;
+    }
+}
+        
+        console.log('Calculating sliding door cost:', {
+            height, width, profileColour, selectedTypeKey, fixedHeight, glassType, glassThickness
+        });
+        
+        try {
+            const requestData = {
+                height,
+                width,
+                // Doors resolve through their own key; the bridge treats an unknown
+                // door key as an error instead of falling back to a window type
+                steelSlidingDoorTypeKey: selectedTypeKey,
+                // Send null when the user did not type a value, so the backend can
+                // tell "user asked for X" (validated against the 1800mm minimum)
+                // from "use the 500mm default" (allowed, warned about in the UI).
+                // The backend resolves null to 500, so the price is unchanged.
+                fixedHeight: userSuppliedFixedHeight ? fixedHeight : null,
+                glassType,
+                glassThickness,
+                // Steel is priced by material GAUGE, not by profile colour, but the
+                // colour is still the customer's chosen finish and is recorded with
+                // the order (and shown on the cart line).
+                profileColour,
+                profileGauge,
+                // "Exclude glazing?" switch: drops the glass and double tape, and
+                // with them their share of the installation charge.
+                excludeGlazing: !!(document.getElementById('glazing-toggle')?.checked)
+            };
+            
+            const response = await fetch(`${HEROKU_BACKEND_URL}/api/steel-calculations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+            
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.status}`);
+            }
+            
+            const data = await response.json();
+
+            
+            if (data.success && data.totalCost !== undefined) {
+                return {
+                    cost: data.totalCost,
+                    breakdown: data.breakdown,
+                    requestData
+                };
+            } else {
+                throw new Error('Invalid response format from server');
+            }
+            
+        } catch (error) {
+            console.error('Error calculating sliding door cost:', error);
+            alert('Error calculating sliding door cost. Please try again.');
+            if (error.message.includes('Failed to fetch')) {
+                alert('Calculator engine is waking up. Please give it a few seconds.');
+            }
+            return null;
+        }
+    }
+
+
 
     // ============================================
     // TOP-HUNG CALCULATION (EXISTING - UNCHANGED)
@@ -683,6 +992,12 @@ if (doorHasFixedHeight) {
                 break;
             case 'slidingAluDoors':
                 result = await calculateSlidingAluDoorCost();
+                break;
+            case 'steelSlidingDoors':
+                result = await calculateSteelSlidingDoorCost();
+                break;
+            case 'steelSlidingWindows':
+                result = await calculateSteelSlidingWindowCost();
                 break;
             case 'blinds':
                 result = await calculateWindowBlindsCost();
@@ -1306,11 +1621,16 @@ if (doorHasFixedHeight) {
         return { validWidth, validHeight };
     }
 
-    // Add event listeners for height and width changes to update vent fields
+    // Add event listeners for height and width changes to update vent fields.
+    // TOP-HUNG ONLY: this validator decides which vent inputs are visible. On any
+    // other page window.selectedTopHungType is undefined, so the 'doublePanel'
+    // fallback used to run and set showWidthInput = false - which is exactly what
+    // made #ventWidth vanish on the casement page after typing a measurement and
+    // then blurring (the 'change' event).
     const heightId = document.getElementById('heightId');
     const widthId = document.getElementById('widthId');
 
-    if (heightId) {
+    if (currentPage === 'topHung' && heightId) {
         heightId.addEventListener('change', function() {
             const totalHeight = parseInt(this.value || 0);
             const totalWidth = parseInt(document.getElementById('widthId')?.value || 0);
@@ -1327,7 +1647,7 @@ if (doorHasFixedHeight) {
         });
     }
 
-    if (widthId) {
+    if (currentPage === 'topHung' && widthId) {
         widthId.addEventListener('change', function() {
             const totalWidth = parseInt(this.value || 0);
             const totalHeight = parseInt(document.getElementById('heightId')?.value || 0);
@@ -1584,7 +1904,9 @@ if (doorHasFixedHeight) {
             'glass-types.html': 'glass',
             'index.html': 'sliding',
             'aluminium-casement-windows.html': 'casement',
-            'window-blinds.html': 'blinds'
+            'window-blinds.html': 'blinds',
+            'steel-sliding-windows.html': 'steelSlidingWindows',
+            'steel-sliding-doors.html': 'steelSlidingDoors'
         };
         
         if (pageMap[filename]) {

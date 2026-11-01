@@ -531,3 +531,58 @@
                 max-width: 150px;
             }
         }
+
+/* ------------------------------------------------------------------
+   Steel pages: the "Exclude glazing?" switch (id="glazing-toggle").
+   The native checkbox is hidden and its sibling .slider becomes the
+   switch body, so the markup needs no extra elements.
+   Scoped to #glazing-toggle: no other page or toggle is affected.
+   ------------------------------------------------------------------ */
+#glazing-toggle {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* switch body: 40 x 15, fully rounded */
+#glazing-toggle + .slider {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 15px;
+    border-radius: 999px;
+    background: #204665;              /* OFF = hero background */
+    vertical-align: middle;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+}
+
+/* the knob: add-to-cart green, rounded */
+#glazing-toggle + .slider::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #2ecc71;              /* #add-to-cart */
+    transition: transform 0.25s ease;
+}
+
+/* ON: green track, knob slid to the right */
+#glazing-toggle:checked + .slider {
+    background: #27ae60;              /* add-to-cart hover green */
+}
+
+#glazing-toggle:checked + .slider::before {
+    transform: translateX(25px);      /* 40 - 13 - 2 */
+}
+
+/* keyboard focus ring, since the real checkbox is invisible */
+#glazing-toggle:focus-visible + .slider {
+    outline: 2px solid #2ecc71;
+    outline-offset: 2px;
+}

@@ -396,7 +396,7 @@ const slidingAluDoorTypes = [
 ];
 
 // ============================================ 
-// SLIDING ALU DOOR TYPES (NEW)
+// BLINDS TYPES (NEW)
 // ============================================
 const windowBlindsTypes = [
     // Vertical one-way blinds 
@@ -439,6 +439,143 @@ const windowBlindsTypes = [
         typeKey: 'bType4'
     },
 ];
+
+// ============================================
+// STEEL SLIDING WINDOW TYPES (NEW)
+// ============================================
+const steelSlidingWindowTypes = [
+    // 2 PANEL WINDOWS
+    {
+        id: 'steelType1',
+        value: '2-noPartition',
+        imageSrc: 'img/type-select-images/steelType-1.png',
+        width: '150px',
+        label: '2 Panels (No Fixed)',
+        hasFixedHeight: false,
+        typeKey: 'steelType1'
+    },
+    {
+        id: 'steelType2',
+        value: '2-fixedTop',
+        imageSrc: 'img/type-select-images/steelType-2.png',
+        width: '197px',
+        label: '2 Panels (Single Fixed)',
+        hasFixedHeight: true,
+        typeKey: 'steelType2'
+    },
+    {
+        id: 'steelType3',
+        value: '2-doubleFixed',
+        imageSrc: 'img/type-select-images/steelType-3.png',
+        width: '150px',
+        label: '2 Panels (Double Fixed)',
+        hasFixedHeight: true,
+        typeKey: 'steelType3'
+    },
+    // 3 PANEL WINDOWS
+    {
+        id: 'steelType4',
+        value: '3-noPartition',
+        imageSrc: 'img/type-select-images/steelType-4.png',
+        width: '197px',
+        label: '3 Panels (No Fixed)',
+        hasFixedHeight: false,
+        typeKey: 'steelType4'
+    },
+    {
+        id: 'steelType5',
+        value: '3-fixedTop',
+        imageSrc: 'img/type-select-images/steelType-5.png',
+        width: '197px',
+        label: '3 Panels (Single Fixed)',
+        hasFixedHeight: true,
+        typeKey: 'steelType5'
+    },
+    {
+        id: 'steelType6',
+        value: '3-doubleFixed',
+        imageSrc: 'img/type-select-images/steelType-6.png',
+        width: '167px',
+        label: '3 Panels (Double Fixed)',
+        hasFixedHeight: true,
+        typeKey: 'steelType6'
+    },
+    // 4 PANEL WINDOWS
+    {
+        id: 'steelType7',
+        value: '4-noPartition',
+        imageSrc: 'img/type-select-images/steelType-7.png',
+        width: '167px',
+        label: '4 Panels (No Fixed)',
+        hasFixedHeight: false,
+        typeKey: 'steelType7'
+    },
+    {
+        id: 'steelType8',
+        value: '4-fixedTop',
+        imageSrc: 'img/type-select-images/steelType-8.png',
+        width: '167px',
+        label: '4 Panels (Single Fixed)',
+        hasFixedHeight: true,
+        typeKey: 'steelType8'
+    },
+    {
+        id: 'steelType9',
+        value: '4-doubleFixed',
+        imageSrc: 'img/type-select-images/steelType-9.png',
+        width: '167px',
+        label: '4 Panels (Double Fixed)',
+        hasFixedHeight: true,
+        typeKey: 'steelType9'
+    },
+
+];
+
+// ============================================
+// SLIDING Sliding DOOR TYPES (NEW)
+// ============================================
+const steelSlidingDoorTypes = [
+    // 2 PANEL Sliding Door
+    {
+        id: 'steelType31',
+        value: '2-noPartition-steelSlidingDoor',
+        imageSrc: 'img/type-select-images/steelType-31.png',
+        width: '150px',
+        label: '2 Panels Steel Door (No Fixed) - no insect Mesh',
+        hasFixedHeight: false,
+        typeKey: 'steelType31'
+    },
+    {
+        id: 'steelType32',
+        value: '2-fixedTop-steelSlidingDoor',
+        imageSrc: 'img/type-select-images/steelType-32.png',
+        width: '197px',
+        label: '2 Panels Steel Door (Single Fixed) - no insect Mesh',
+        hasFixedHeight: true,
+        typeKey: 'steelType32'
+    },
+
+
+    // 4 PANEL DOORS
+    {
+        id: 'steelType37',
+        value: '4-noPartition-steelSlidingDoor',
+        imageSrc: 'img/type-select-images/steelType-37.png',
+        width: '167px',
+        label: '4 Panels Steel Door (No Fixed) - no insect Mesh',
+        hasFixedHeight: false,
+        typeKey: 'steelType37'
+    },
+    {
+        id: 'steelType38',
+        value: '4-fixedTop-steelSlidingDoor',
+        imageSrc: 'img/type-select-images/steelType-38.png',
+        width: '167px',
+        label: '4 Panels Door (Single Fixed) - no insect Mesh',
+        hasFixedHeight: true,
+        typeKey: 'steelType38'
+    },
+]
 
 // ============================================
 // SLIDING SELECTION
@@ -712,7 +849,10 @@ function validateFixedHeight(totalHeight) {
                          selectedSlidingType.typeKey === 'type9' || 
                          selectedSlidingType.typeKey === 'type10' || 
                          selectedSlidingType.typeKey === 'type11' || 
-                         selectedSlidingType.typeKey === 'type12';
+                         selectedSlidingType.typeKey === 'type12' ||
+                         selectedSlidingType.typeKey === 'steelType3' || 
+                         selectedSlidingType.typeKey === 'steelType6' || 
+                         selectedSlidingType.typeKey === 'steelType9';
     
     // If no value entered, use default 500mm
     if (rawValue === '') {
@@ -850,6 +990,76 @@ function validateAluDoorFixedHeight(totalHeight) {
     
     infoDiv.innerHTML = `✅ Using fixed height: ${fixedHeight}mm. Openable section: ${openableHeight}mm (minimum ${ALU_DOOR_MIN_OPENABLE_HEIGHT}mm)`;
     currentSlidingAluDoorFixedHeight = fixedHeight;
+    return fixedHeight;
+}
+
+// ============================================
+// STEEL DOOR FIXED HEIGHT VALIDATION (UI Help Text Only)
+// Sliding steel doors are SINGLE fixed only - never double fixed.
+// Rule: the openable (sliding) section must be at least 1800mm tall.
+// Default fixed partition is 500mm, i.e. default openable = totalHeight - 500.
+// ============================================
+const STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT = 1800;
+const STEEL_SLIDING_DOOR_DEFAULT_FIXED_HEIGHT = 500;
+
+function validateSteelSlidingDoorFixedHeight(totalHeight) {
+    const fixedHeightInput = document.getElementById('fixedHeightInput');
+    const warningsDiv = document.getElementById('fixed-height-warnings');
+    const infoDiv = document.getElementById('fixed-height-info');
+    
+    if (!fixedHeightInput || !warningsDiv || !infoDiv) return null;
+    if (!selectedSteelSlidingDoorType || !selectedSteelSlidingDoorType.hasFixedHeight) return null;
+    
+    const rawValue = fixedHeightInput.value.trim();
+    
+    // Clear previous messages
+    warningsDiv.innerHTML = '';
+    infoDiv.innerHTML = '';
+    
+    // Largest fixed partition this height can carry and still leave 1800mm openable
+    const maxFixedHeight = totalHeight - STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT;
+    
+    // No user value: the 500mm default applies, i.e. openable = totalHeight - 500
+    if (rawValue === '') {
+        const openableHeight = totalHeight - STEEL_SLIDING_DOOR_DEFAULT_FIXED_HEIGHT;
+        currentSteelSlidingDoorFixedHeight = STEEL_SLIDING_DOOR_DEFAULT_FIXED_HEIGHT;
+        
+        if (openableHeight < STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT) {
+            warningsDiv.innerHTML = `⚠️ The default ${STEEL_SLIDING_DOOR_DEFAULT_FIXED_HEIGHT}mm fixed partition leaves only ${openableHeight}mm openable, below the ${STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT}mm minimum for a door. Increase the height, or choose a door type without a fixed partition.`;
+        } else {
+            infoDiv.innerHTML = `ℹ️ Using default fixed height: ${STEEL_SLIDING_DOOR_DEFAULT_FIXED_HEIGHT}mm. Openable section: ${openableHeight}mm (minimum ${STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT}mm)`;
+        }
+        return STEEL_SLIDING_DOOR_DEFAULT_FIXED_HEIGHT;
+    }
+    
+    const fixedHeight = parseInt(rawValue);
+    
+    if (isNaN(fixedHeight) || fixedHeight <= 0) {
+        warningsDiv.innerHTML = '⚠️ Please enter a valid positive number for fixed height';
+        return null;
+    }
+    
+    const openableHeight = totalHeight - fixedHeight;
+    
+    // A user-supplied fixed height must leave at least 1800mm of openable door
+    if (openableHeight < STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT) {
+        const remedy = maxFixedHeight > 0
+            ? `Choose a door type without a fixed partition, or reduce the fixed height to ${maxFixedHeight}mm or less.`
+            : `Choose a door type without a fixed partition - at ${totalHeight}mm height there is no room for one.`;
+        
+        warningsDiv.innerHTML = `⚠️ Fixed height of ${fixedHeight}mm is too large: it leaves only ${openableHeight}mm openable, below the ${STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT}mm minimum for a door. ${remedy}`;
+        currentSteelSlidingDoorFixedHeight = fixedHeight;
+        return null;
+    }
+    
+    if (fixedHeight < 200) {
+        warningsDiv.innerHTML = '⚠️ Fixed height should be at least 200mm for structural integrity';
+        currentSteelSlidingDoorFixedHeight = fixedHeight;
+        return null;
+    }
+    
+    infoDiv.innerHTML = `✅ Using fixed height: ${fixedHeight}mm. Openable section: ${openableHeight}mm (minimum ${STEEL_SLIDING_DOOR_MIN_OPENABLE_HEIGHT}mm)`;
+    currentSteelSlidingDoorFixedHeight = fixedHeight;
     return fixedHeight;
 }
 
@@ -1224,6 +1434,312 @@ function initSlidingAluDoorSelection() {
 }
 
 // ============================================
+// STEEL SLIDING DOOR SELECTION
+// ============================================
+// ============================================
+// STEEL SLIDING WINDOW SELECTION
+// ============================================
+// Only types that have calculation logic in steelCalculationService.js can be
+// quoted. The other window types (steelType2/3/4/5/6/7/8/9) already have entries
+// in steelSlidingWindowTypes above - add them here once their logic AND their
+// tile image exist, so nobody can select a type that cannot be priced.
+const IMPLEMENTED_STEEL_SLIDING_WINDOW_TYPES = new Set(['steelType1']);
+
+let selectedSteelSlidingWindowType = null;
+let selectedSteelSlidingWindowTypeKey = null;
+let currentSteelSlidingWindowFixedHeight = null;
+
+function selectSteelSlidingWindowType(type, element) {
+    // Remove selected class from all options
+    document.querySelectorAll('#steelSlidingWindowTypeSelector .image-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+
+    if (element) element.classList.add('selected');
+
+    selectedSteelSlidingWindowType = type;
+    selectedSteelSlidingWindowTypeKey = type.typeKey;
+
+    // Globals so app.js can read the selection across script boundaries
+    window.selectedSteelSlidingWindowTypeKey = type.typeKey;
+    window.currentSteelSlidingWindowTypeKey = type.typeKey;
+
+    console.log(`Selected steel sliding window: ${type.value} - ${type.label} (key: ${type.typeKey})`);
+
+    // Show/hide the fixed height input
+    const fixedHeightContainer = document.getElementById('fixedHeightContainer');
+    if (fixedHeightContainer) {
+        if (type.hasFixedHeight) {
+            fixedHeightContainer.classList.add('visible');
+        } else {
+            fixedHeightContainer.classList.remove('visible');
+            const info = document.getElementById('fixed-height-info');
+            const warnings = document.getElementById('fixed-height-warnings');
+            if (info) info.innerHTML = '';
+            if (warnings) warnings.innerHTML = '';
+        }
+    }
+
+    // Reset the fixed height when the type changes
+    const fixedHeightInput = document.getElementById('fixedHeightInput');
+    if (fixedHeightInput) {
+        fixedHeightInput.value = '';
+        currentSteelSlidingWindowFixedHeight = null;
+    }
+
+    // NOTE: app.js listens for 'steelSlidingWindowChanged'
+    document.dispatchEvent(new CustomEvent('steelSlidingWindowChanged', {
+        detail: {
+            type: type.value,
+            label: type.label,
+            typeKey: type.typeKey,
+            hasFixedHeight: type.hasFixedHeight
+        }
+    }));
+
+    if (typeof window.updatePreview === 'function') {
+        window.updatePreview();
+    }
+}
+
+function initSteelSlidingWindowSelection() {
+    const selector = document.getElementById('steelSlidingWindowTypeSelector');
+    if (!selector) return;
+
+    selector.innerHTML = '';
+
+    const available = steelSlidingWindowTypes.filter(
+        (type) => IMPLEMENTED_STEEL_SLIDING_WINDOW_TYPES.has(type.typeKey)
+    );
+
+    available.forEach(type => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'image-option';
+        optionDiv.dataset.type = type.value;
+        optionDiv.dataset.id = type.id;
+        optionDiv.dataset.typeKey = type.typeKey;
+
+        optionDiv.innerHTML = `
+            <img src="${type.imageSrc}" alt="${type.label}" width="${type.width}" height="110">
+        `;
+
+        optionDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectSteelSlidingWindowType(type, optionDiv);
+        });
+
+        selector.appendChild(optionDiv);
+    });
+
+    // Select the first available option by default
+    if (available.length > 0) {
+        const firstOption = selector.querySelector('.image-option');
+        if (firstOption) {
+            selectSteelSlidingWindowType(available[0], firstOption);
+        }
+    }
+}
+
+window.selectSteelSlidingWindowType = selectSteelSlidingWindowType;
+window.initSteelSlidingWindowSelection = initSteelSlidingWindowSelection;
+window.getSelectedSteelSlidingWindowType = () => selectedSteelSlidingWindowType;
+
+// ============================================
+// STEEL SLIDING DOOR SELECTION
+// ============================================
+let selectedSteelSlidingDoorType = null;
+let selectedSteelSlidingDoorTypeKey = null;
+let currentSteelSlidingDoorFixedHeight = null;
+
+function selectSteelSlidingDoorType(type, element) {
+    // Remove selected class from all options
+    document.querySelectorAll('#steelSlidingDoorTypeSelector .image-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked option
+    element.classList.add('selected');
+    
+    // Update the selected type
+    selectedSteelSlidingDoorType = type;
+    selectedSteelSlidingDoorTypeKey = type.typeKey;
+
+    // CRITICAL FIX: Update the global window property so app.js can read it
+    window.selectedSteelSlidingDoorTypeKey = type.typeKey;
+    window.currentSteelSlidingDoorTypeKey = type.typeKey;
+    
+    console.log(`Selected sliding type: ${type.value} - ${type.label} (key: ${type.typeKey})`);
+
+    console.log(`🔄 window.selectedSteelSlidingDoorTypeKey set to: ${window.selectedSteelSlidingDoorTypeKey}`);
+
+    
+    // Show/hide fixed height input
+    const fixedHeightContainer = document.getElementById('fixedHeightContainer');
+    if (fixedHeightContainer) {
+        if (type.hasFixedHeight) {
+            fixedHeightContainer.classList.add('visible');
+        } else {
+            fixedHeightContainer.classList.remove('visible');
+            // Clear any warnings/info
+            document.getElementById('fixed-height-info').innerHTML = '';
+            document.getElementById('fixed-height-warnings').innerHTML = '';
+        }
+    }
+    
+    // Reset fixed height when type changes
+    const fixedHeightInput = document.getElementById('fixedHeightInput');
+    if (fixedHeightInput) {
+        fixedHeightInput.value = '';
+        currentSteelSlidingDoorFixedHeight = null;
+    }
+    
+    // Trigger a custom event that app.js can listen to
+    // NOTE: app.js listens for 'steelSlidingDoorChanged' (not 'slidingChanged')
+    const event = new CustomEvent('steelSlidingDoorChanged', { 
+        detail: { 
+            type: type.value, 
+            label: type.label,
+            typeKey: type.typeKey,
+            hasFixedHeight: type.hasFixedHeight
+        }
+    });
+    document.dispatchEvent(event);
+    
+    // Also trigger the global updatePreview if available
+    if (typeof window.updatePreview === 'function') {
+        window.updatePreview();
+    }
+    
+    // Refresh the fixed-partition guidance immediately. Without this the info and
+    // warning divs only update on a height/fixed-height input event, so a user who
+    // just clicks a different type image never sees the current guidance.
+    const heightInput = document.getElementById('heightId');
+    const totalHeight = heightInput ? parseInt(heightInput.value) : NaN;
+    if (!isNaN(totalHeight) && totalHeight > 0) {
+        validateSteelSlidingDoorFixedHeight(totalHeight);
+    }
+}
+
+// ============================================
+// STEEL DOOR: no-fixed fallback types
+// When the default 500mm fixed partition leaves less than 1800mm openable the
+// calculation is denied and the equivalent door WITHOUT a fixed partition is
+// selected instead. Panel count and insect mesh are preserved; only the fixed
+// (awning) top is dropped. The hybrid types have no hybrid equivalent, so they
+// fall back to the plain sliding door of the same panel count.
+// ============================================
+const STEEL_SLIDING_DOOR_NO_FIXED_FALLBACK = {
+    // Keyed by the steel typeKey (NOT 'type32'), because the caller passes
+    // selectedTypeKey which is always 'steelTypeXX'. The previous keys never
+    // matched, so the fallback silently failed and the dialog fell through to the
+    // generic "unreachable" message instead of selecting a no-fixed door.
+    steelType32: 'steelType31', // 2 panel
+    steelType38: 'steelType37'  // 4 panel
+};
+
+function getSteelSlidingDoorNoFixedFallback(typeKey) {
+    return STEEL_SLIDING_DOOR_NO_FIXED_FALLBACK[typeKey] || null;
+}
+
+// Bring an option into the centre of the selector strip. Uses rect maths rather
+// than scrollIntoView so the page's vertical scroll position is never disturbed.
+function scrollSteelSlidingDoorTypeIntoView(option) {
+    const selector = document.getElementById('steelSlidingDoorTypeSelector');
+    if (!selector || !option) return;
+    if (typeof selector.getBoundingClientRect !== 'function' ||
+        typeof option.getBoundingClientRect !== 'function') return;
+    
+    const maxScroll = selector.scrollWidth - selector.clientWidth;
+    if (maxScroll <= 0) return;   // the strip fits, nothing to scroll
+    
+    const selectorRect = selector.getBoundingClientRect();
+    const optionRect = option.getBoundingClientRect();
+    const target = selector.scrollLeft + (optionRect.left - selectorRect.left)
+                 - (selector.clientWidth - optionRect.width) / 2;
+    const left = Math.max(0, Math.min(target, maxScroll));
+    
+    // Stop the one-off discoverability nudge from scrolling the strip straight
+    // back away from the newly selected type.
+    try { sessionStorage.setItem('nudge_steelSlidingDoorTypeSelector', 'true'); } catch (err) {}
+    
+    if (typeof selector.scrollTo === 'function') {
+        selector.scrollTo({ left: left, behavior: 'smooth' });
+    } else {
+        selector.scrollLeft = left;
+    }
+}
+
+// Programmatically select a door type by its typeKey, driving the same code path
+// as a user click (selected class, globals, fixed-height container, preview).
+// Also scrolls the strip to the new selection - after an automatic fallback the
+// substitute can be far from wherever the user was looking.
+function selectSteelSlidingDoorTypeByKey(typeKey) {
+    const selector = document.getElementById('steelSlidingDoorTypeSelector');
+    if (!selector || !typeKey) return null;
+    
+    const type = steelSlidingDoorTypes.find(t => t.typeKey === typeKey);
+    if (!type) return null;
+    
+    const optionDiv = selector.querySelector(`.image-option[data-type-key="${typeKey}"]`);
+    if (!optionDiv) return null;
+    
+    // selectSteelSlidingDoorType refreshes the fixed-partition guidance itself,
+    // so no explicit clear happens here - clearing would wipe the fresh text.
+    selectSteelSlidingDoorType(type, optionDiv);
+    
+    scrollSteelSlidingDoorTypeIntoView(optionDiv);
+    
+    return type;
+}
+
+function initSteelSlidingDoorSelection() {
+    const steelSlidingDoorTypeSelector = document.getElementById('steelSlidingDoorTypeSelector');
+    if (!steelSlidingDoorTypeSelector) return;
+    
+    steelSlidingDoorTypeSelector.innerHTML = '';
+    
+    steelSlidingDoorTypes.forEach(type => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'image-option';
+        optionDiv.dataset.type = type.value;
+        optionDiv.dataset.id = type.id;
+        optionDiv.dataset.typeKey = type.typeKey;
+        optionDiv.dataset.hasFixedHeight = type.hasFixedHeight;
+        
+        optionDiv.innerHTML = `
+            <img src="${type.imageSrc}" alt="${type.label}" width="${type.width}" height="110">
+        `;
+        
+        optionDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectSteelSlidingDoorType(type, optionDiv);
+        });
+        
+        steelSlidingDoorTypeSelector.appendChild(optionDiv);
+    });
+    
+    // Select the first option by default
+    if (steelSlidingDoorTypes.length > 0) {
+        const firstOption = steelSlidingDoorTypeSelector.querySelector('.image-option');
+        if (firstOption) {
+            // Check if there's a preselected value from localStorage or URL
+            const preselectedSteelSlidingDoorType = localStorage.getItem('selectedSteelSlidingDoorType');
+            if (preselectedSteelSlidingDoorType) {
+                const matchedOption = steelSlidingDoorTypeSelector.querySelector(`.image-option[data-type="${preselectedSteelSlidingDoorType}"]`);
+                if (matchedOption) {
+                    const matchedType = steelSlidingDoorTypes.find(t => t.value === preselectedSteelSlidingDoorType);
+                    if (matchedType) {
+                        selectSteelSlidingDoorType(matchedType, matchedOption);
+                        return;
+                    }
+                }
+            }
+            selectSteelSlidingDoorType(steelSlidingDoorTypes[0], firstOption);
+        }
+    }
+}
+
+// ============================================
 // WINDOW BLINDS SELECTION
 // ============================================
 let selectedWindowBlindType = null;
@@ -1361,6 +1877,42 @@ function initAllSelections() {
     // Initialize based on which selector exists on the page
     if (document.getElementById('windowBlindTypeSelector')) {
         initWindowBlindSelection();
+    }
+
+    if (document.getElementById('steelSlidingWindowTypeSelector')) {
+        initSteelSlidingWindowSelection();
+    }
+
+    if (document.getElementById('steelSlidingDoorTypeSelector')) {
+        initSteelSlidingDoorSelection();
+
+        // Keep the fixed-partition guidance in sync with the height and fixed-height
+        // inputs, exactly like the aluminium door branch further down.
+        const steelDoorFixedHeightInput = document.getElementById('fixedHeightInput');
+        if (steelDoorFixedHeightInput) {
+            steelDoorFixedHeightInput.addEventListener('input', function() {
+                const heightInput = document.getElementById('heightId');
+                if (heightInput && heightInput.value) {
+                    const totalHeight = parseInt(heightInput.value);
+                    if (!isNaN(totalHeight) && totalHeight > 0) {
+                        validateSteelSlidingDoorFixedHeight(totalHeight);
+                    }
+                }
+            });
+        }
+
+        // Also validate when the height changes
+        const steelDoorHeightInput = document.getElementById('heightId');
+        if (steelDoorHeightInput) {
+            steelDoorHeightInput.addEventListener('change', function() {
+                const totalHeight = parseInt(this.value);
+                if (!isNaN(totalHeight) && totalHeight > 0 && selectedSteelSlidingDoorType && selectedSteelSlidingDoorType.hasFixedHeight) {
+                    validateSteelSlidingDoorFixedHeight(totalHeight);
+                }
+            });
+        }
+
+        setTimeout(() => nudgeScrollableSelector('steelSlidingDoorTypeSelector', 800), 1200);
     }
     if (document.getElementById('casementTypeSelector')) {
         initCasementSelection();

@@ -110,6 +110,34 @@
         { "name": "Curtain Walling", "path": "/curtain-walling-facades.html" }
       ],
       "sitemap": { "priority": "0.7", "changefreq": "monthly" }
+    },
+    {
+      "file": "steel-sliding-windows.html",
+      "path": "/steel-sliding-windows.html",
+      "title": "Steel Sliding Windows Price in Kenya | Instant Quote",
+      "description": "Price steel sliding windows in Kenya instantly. Choose the steel gauge, glass type and panel layout to get a live quote in seconds.",
+      "h1": "Steel sliding windows price in Kenya \u2014 instant quote calculator",
+      "ogImage": "/img/og/og-steel-sliding-windows.jpg",
+      "ogImageAlt": "Capital Builders steel sliding windows price calculator",
+      "breadcrumb": [
+        { "name": "Home", "path": "/" },
+        { "name": "Steel Sliding Windows", "path": "/steel-sliding-windows.html" }
+      ],
+      "sitemap": { "priority": "0.8", "changefreq": "monthly" }
+    },
+    {
+      "file": "steel-sliding-doors.html",
+      "path": "/steel-sliding-doors.html",
+      "title": "Steel Sliding Doors Price in Kenya | Instant Quote",
+      "description": "Price steel sliding doors in Kenya instantly. Choose single-fixed or no-fixed designs, steel gauge and glass for a live quote in seconds.",
+      "h1": "Steel sliding doors price in Kenya \u2014 instant quote calculator",
+      "ogImage": "/img/og/og-steel-sliding-doors.jpg",
+      "ogImageAlt": "Capital Builders steel sliding doors price calculator",
+      "breadcrumb": [
+        { "name": "Home", "path": "/" },
+        { "name": "Steel Sliding Doors", "path": "/steel-sliding-doors.html" }
+      ],
+      "sitemap": { "priority": "0.8", "changefreq": "monthly" }
     }
   ]
 }

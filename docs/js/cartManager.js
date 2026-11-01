@@ -65,6 +65,15 @@ class CartManager {
       type50: { label: '2 Panel Sliding Door, awning top + Insect mesh', category: 'sliding-hybridAluDoor' },
       type51: { label: '3 Panel Sliding Door, awning top + Insect mesh', category: 'sliding-hybridAluDoor' },
       type52: { label: '4 Panel Sliding Door, awning top + Insect mesh', category: 'sliding-hybridAluDoor' },
+
+      // Steel Sliding Windows
+      steelType1: { label: '2 Panel Steel Sliding Window', category: 'steelSlidingWindow' },
+
+      // Steel Sliding Doors
+      steelType31: { label: '2 Panel Steel Door (No Fixed)', category: 'steelSlidingDoor' },
+      steelType32: { label: '2 Panel Steel Door (Single Fixed)', category: 'steelSlidingDoor' },
+      steelType37: { label: '4 Panel Steel Door (No Fixed)', category: 'steelSlidingDoor' },
+      steelType38: { label: '4 Panel Steel Door (Single Fixed)', category: 'steelSlidingDoor' },
     };
 
     // A cart arriving via a share link is a READ-ONLY SNAPSHOT. It is only ever
@@ -558,6 +567,13 @@ class CartManager {
         
         // Get the correct image path based on category
         const imagePath = this.getImagePath(item.type, item.typeInfo.category);
+
+        // Steel items priced with the "Exclude glazing?" switch still carry
+        // neutral glass values (the schema requires them) even though no glass was
+        // quoted, so the cart must not imply one was included.
+        const glassLabel = item.glazingExcluded
+          ? 'Excluded'
+          : `${item.glassThickness} ${item.glassType}`;
         
         html += `
           <div class="cart-item" data-id="${item._id}" data-category="${item.typeInfo.category}">
@@ -568,7 +584,8 @@ class CartManager {
               <h4>${item.typeInfo.label}</h4>
               <p>${item.measurements.width} × ${item.measurements.height} mm</p>
               <p>Color: ${item.profileColour}</p>
-              <p>Glass: ${item.glassThickness} ${item.glassType}</p>
+              ${item.profileGauge ? `<p>Gauge: ${item.profileGauge}</p>` : ''}
+              <p>Glass: ${glassLabel}</p>
               <button class="remove-btn" onclick="cartManager.removeItem('${item._id}')">Remove</button>
             </div>
             <div class="price">
@@ -641,11 +658,20 @@ class CartManager {
       'slidingAluDoor': '/img/labels/doors/',
       'sliding-hybridAluDoor': '/img/labels/doors/',
       'facades': '/img/labels/facades/',
-      'partitions': '/img/labels/partitions/'
+      'partitions': '/img/labels/partitions/',
+      'steelSlidingWindow': '/img/type-select-images/',
+      'steelSlidingDoor': '/img/type-select-images/'
     };
     
     const dir = imageDirs[category] || '/img/labels/';
-    return `${dir}${type}.png`;
+
+    // Steel tiles are named steelType-1.png (hyphen) while the stored type key is
+    // steelType1, so normalise the filename stem for the steel categories.
+    const stem = (category === 'steelSlidingWindow' || category === 'steelSlidingDoor')
+      ? String(type).replace(/^steelType/, 'steelType-')
+      : type;
+
+    return `${dir}${stem}.png`;
   }
 
   async exportQuote() {
