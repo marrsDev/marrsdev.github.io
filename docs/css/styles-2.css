@@ -1614,3 +1614,30 @@ a {
 
 
 
+
+/* ------------------------------------------------------------------
+   Main navigation spacing (desktop / tablet, i.e. when the hamburger is
+   not in use).
+
+   The nav links carry no horizontal padding on desktop, so the gaps came
+   entirely from `justify-content: space-around` distributing leftover
+   space. The nav now has 11 links and overflows its 1200px container, so
+   that leftover space is zero and adjacent links touch - e.g. "DoorsSteel
+   Sliding Doors". The gap below is a hard minimum rather than a
+   distribution, and `flex-wrap` stops the row from overflowing its
+   container on narrower desktops.
+   Interim measure - replace with the new menu layout when it lands.
+   ------------------------------------------------------------------ */
+@media (min-width: 552px) {
+    .main-navigation ul {
+        flex-wrap: wrap;
+        gap: 2px 12px;
+    }
+
+    .main-navigation ul li a {
+        display: inline-block;
+        padding: 4px 2px;
+        font-size: 0.8rem;
+        white-space: nowrap; /* never break a label mid-phrase */
+    }
+}
