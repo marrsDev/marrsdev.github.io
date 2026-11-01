@@ -576,6 +576,17 @@ class CartManager {
     if (item.ventHeight !== undefined && item.ventHeight !== null) {
       rows.push(['Vent height', `${item.ventHeight} mm`]);
     }
+
+    // Doors with a fixed partition and doors with an awning/openable top share ONE
+    // input in the calculators, but calling an awning an "fixed partition" on the
+    // cart would be misleading. The hybrid categories are the openable-top ones.
+    if (item.fixedHeight !== undefined && item.fixedHeight !== null) {
+      const label = /hybrid/i.test(typeInfo.category)
+        ? 'Awning top'
+        : 'Fixed partition height';
+      rows.push([label, `${item.fixedHeight} mm`]);
+    }
+
     rows.push(['Color', item.profileColour]);
     if (item.profileGauge) rows.push(['Gauge', item.profileGauge]);
     rows.push(['Glass', glass]);
